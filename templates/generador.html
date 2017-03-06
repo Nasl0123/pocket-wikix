@@ -1,0 +1,15 @@
+	<form name='formu' method="post" action="/_edit{{link}}">
+		<textarea name="content" style="display:none;margin: 0px; width: 100%; min-height: 200px; height: 400px;min-width:280px">{{contenido}}</textarea>
+		<button id='submit' type="submit" name="submit" style="display:none"></button>
+		<img src='http://www.owlhatworld.com/wp-content/uploads/2015/12/1.gif'>
+	</form>
+	<script type="text/javascript">
+		window.onload = function(){
+/*			window.location.replace("/_edit{{link}}?content=");*/
+
+			document.forms.formu.submit.click()
+
+/*    		var button = document.getElementById('submit');
+    		button.form.submit();*/
+		}
+	</script>

@@ -1,0 +1,12 @@
+{%extends 'base.html'%}
+{%block content%}
+<pre>
+<div id='contenido'>
+{{page}}
+{%if user_base%}
+<br><br>
+<a href="/_edit{{link}}">Editar</a>
+{%endif%}
+</div>
+</pre>
+{%endblock%}

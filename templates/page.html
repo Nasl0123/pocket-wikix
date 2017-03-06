@@ -1,0 +1,10 @@
+{%extends 'base.html'%}
+{%block content%}
+<form method="post">
+<textarea name="content" style="margin: 0px; width: 100%; min-height: 200px; height: 400px;min-width:280px">
+{%if page -%}
+	{{page.page[version]}}
+{%- endif%}</textarea>
+<button>Submit</button>
+</form>
+{%endblock%}

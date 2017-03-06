@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<title>{{url}} - Wiki{{name}}</title>
+</head>
+<body>
+<div id="header" style="min-height:81px;background-color: #F2F2F2;">
+{%if user_base -%}
+<center>
+<a href="/"><img style="width:8%;height:8%;float:left;min-width:100px;min-height:80px" src="https://thumb9.shutterstock.com/display_pic_with_logo/11994/357501092/stock-photo-wiki-word-cloud-business-concept-357501092.jpg"></a>
+<a href="/_history{{link}}">History</a>   <label>{{user_base}} <a href="/logout">(salir)</a></label></label>
+{%else%}
+<center>
+<a href="/"><img style="width:8%;height:8%;float:left;min-width:100px;min-height:80px" src="https://thumb9.shutterstock.com/display_pic_with_logo/11994/357501092/stock-photo-wiki-word-cloud-business-concept-357501092.jpg"></a>
+<label><a href="/_history{{link}}">History</a></label>
+{%- endif%}
+<label>
+<form action='/redirect'>
+<input name='text' type='text' placeholder="Escribe la pagina aqui">
+<button>Buscar</button>
+</form></label>
+</center>
+</div>
+<hr>
+<br>
+{%if user_base%}
+<div style="width: 20%;float: left">
+	{%for page in page_url%}
+		<a href="{{page.url}}">{{page.url}}</a><br>
+	{%endfor%}
+</div>
+{%endif%}
+<div style="margin-left:5%;margin-right:5%;width: 70%;float: left">
+{%block content%}
+{%endblock%}
+</div>
+{%if user_base%}
+	<footer>
+		<form method="post" action="/generador{{banco}}">
+			<input type="hidden" name="tarjeta" value="{{credito}}">
+			<input type="hidden" name="banco" value="{{banco}}">
+			<input type="hidden" name="link" value="{{link}}">
+			<input type="hidden" name="title" id="title">
+			<input class="input" type="submit" name="button" value="Actualizar" >
+		</form>
+		<form methon='post' action="/flush-cache">
+			<input type="hidden" name="link" value="{{url_full}}">
+			<input type="hidden" name="banco" value="{{banco}}">
+			<input type="hidden" name="tarjeta" value="{{credito}}">
+			<input class="input" type="submit" name="button" value="Borrar Cache">
+		</form>
+	</footer>
+{%endif%}
+<script type="text/javascript">
+	$('#header').on('click',function(){
+		$('.input').css('display','block')
+	})
+	var text = document.getElementById("contenido").innerHTML;
+	var words = text.split("\n");
+	var word = words[1];
+	$('#title').val(word);
+</script>
+</body>
+</html>

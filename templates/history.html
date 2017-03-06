@@ -1,0 +1,13 @@
+{%extends 'base.html'%}
+{%block content%}
+	{%for n in version%}
+		<div>
+			<label style="color:gray;font-style:italic">{{created[n]}}</label>
+			<pre style="word-wrap: break-word;margin-right: 2%;overflow: auto;"">{{page_list[n]}}</pre>
+			<label>
+				<a href="{{link}}?v={{n}}">view</a> | <a href="/_edit{{link}}?v={{n}}">edit</a>
+			</label>
+		</div>
+		<br>
+	{%endfor%}
+{%endblock%}
