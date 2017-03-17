@@ -7,9 +7,9 @@ import pdftables_api
 import xlrd
 import xlwt
 
-c = pdftables_api.Client('fc9wow7u2a9c')
+c = pdftables_api.Client('q659dgg6odaz')
 def crear_xlsx(banco):
-    c.xlsx(banco+'.pdf', 'xlsx/'+banco+'_output.xlsx')
+    c.xlsx('pdf/'+banco+'.pdf', 'xlsx/'+banco+'_output.xlsx')
 
 def generar_acap(banco):
     try:

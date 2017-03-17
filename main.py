@@ -16,8 +16,12 @@ from generadorLopezDeHaro import obtener_tarjeta_lopezdeharo,formatear_lopezdeha
 from generadorACAP import obtener_tarjeta_acap,formatear_acap,generar_acap
 from generadorALNAP import obtener_tarjeta_alnap,formatear_alnap,generar_alnap
 from generadorBDI import obtener_tarjeta_bdi,formatear_bdi,generar_bdi
-#from generadorAdemi import obtener_tarjeta_ademi,formatear_ademi,generar_ademi
-#from scraper import obtener_beneficios,datos_tarjeta
+from generadorAdemi import obtener_tarjeta_ademi,formatear_ademi,generar_ademi
+from generadorScotiabank import obtener_tarjeta_scotiabank, formatear_scotiabank, generar_scotiabank
+from generadorBanReservas import obtener_tarjeta_banreservas, formatear_banreservas, generar_banreservas
+from generadorBANACI import obtener_tarjeta_banaci, formatear_banaci, generar_banaci, beneficios_banaci
+from generadorSantaCruz import obtener_tarjeta_santacruz, formatear_santacruz, generar_santacruz
+from scraper import obtener_beneficios,datos_tarjeta
 from indices import get_indices,formato_general,limpiar
 from google.appengine.api import urlfetch
 import json
@@ -458,6 +462,95 @@ class GeneradorAdemi(Handler):
         content = formato_general(self.request.get('title'),contenido,beneficios)
         self.render('generador.html',beneficios=beneficios,cont=contenido,contenido=content,user_base=user_base,url='Generador Ademi',link=self.request.get('link'))
 
+class GeneradorScotiabank(Handler):
+    def get(self):
+        user_base = self.request.cookies.get('user_id')
+        if user_base:
+            user_base = user_base.split('|')[0]
+        else:
+            user_base = ''
+        self.render('generador.html',user_base=user_base,url='Generador Scotiabank')
+    def post(self):
+        user_base = self.request.cookies.get('user_id')
+        if user_base:
+            user_base = user_base.split('|')[0]
+        else:
+            user_base = ''
+        banco = self.request.get('banco')
+        tarjeta = self.request.get('tarjeta')
+        datos = get_cache(banco+tarjeta+'_datos',datos_tarjeta('Scotiabank',self.request.get('tarjeta')))
+        contenido=get_cache(banco+tarjeta+'_contenido',obtener_tarjeta_scotiabank(self.request.get('tarjeta'),generar_scotiabank('Scotiabank')))
+        beneficios=get_cache(banco+tarjeta+'_beneficios',obtener_beneficios(datos[0],datos[1],datos[2]))
+        content = formato_general(self.request.get('title'),contenido,beneficios)
+        self.render('generador.html',beneficios=beneficios,cont=contenido,contenido=content,user_base=user_base,url='Generador Scotiabank',link=self.request.get('link'))
+
+class GeneradorBanReservas(Handler):
+    def get(self):
+        user_base = self.request.cookies.get('user_id')
+        if user_base:
+            user_base = user_base.split('|')[0]
+        else:
+            user_base = ''
+        self.render('generador.html',user_base=user_base,url='Generador BanReservas')
+    def post(self):
+        user_base = self.request.cookies.get('user_id')
+        if user_base:
+            user_base = user_base.split('|')[0]
+        else:
+            user_base = ''
+        banco = self.request.get('banco')
+        tarjeta = self.request.get('tarjeta')
+        datos = get_cache(banco+tarjeta+'_datos',datos_tarjeta('BanReservas',self.request.get('tarjeta')))
+        contenido=get_cache(banco+tarjeta+'_contenido',obtener_tarjeta_banreservas(self.request.get('tarjeta'),generar_banreservas('BanReservas')))
+        beneficios=get_cache(banco+tarjeta+'_beneficios',obtener_beneficios(datos[0],datos[1],datos[2]))
+        content = formato_general(self.request.get('title'),contenido,beneficios)
+        self.render('generador.html',beneficios=beneficios,cont=contenido,contenido=content,user_base=user_base,url='Generador BanReservas',link=self.request.get('link'))
+
+class GeneradorBANACI(Handler):
+    def get(self):
+        user_base = self.request.cookies.get('user_id')
+        if user_base:
+            user_base = user_base.split('|')[0]
+        else:
+            user_base = ''
+        self.render('generador.html',user_base=user_base,url='Generador BANACI')
+    def post(self):
+        user_base = self.request.cookies.get('user_id')
+        if user_base:
+            user_base = user_base.split('|')[0]
+        else:
+            user_base = ''
+        banco = self.request.get('banco')
+        tarjeta = self.request.get('tarjeta')
+        datos = get_cache(banco+tarjeta+'_datos',datos_tarjeta('BANACI',self.request.get('tarjeta')))
+        contenido=get_cache(banco+tarjeta+'_contenido',obtener_tarjeta_banaci(self.request.get('tarjeta'),generar_banaci('BANACI')))
+        beneficios=get_cache(banco+tarjeta+'_beneficios',beneficios_banaci())
+        content = formato_general(self.request.get('title'),contenido,beneficios)
+        self.render('generador.html',beneficios=beneficios,cont=contenido,contenido=content,user_base=user_base,url='Generador BANACI',link=self.request.get('link'))
+
+class GeneradorSantaCruz(Handler):
+    def get(self):
+        user_base = self.request.cookies.get('user_id')
+        if user_base:
+            user_base = user_base.split('|')[0]
+        else:
+            user_base = ''
+        self.render('generador.html',user_base=user_base,url='Generador SantaCruz')
+    def post(self):
+        user_base = self.request.cookies.get('user_id')
+        if user_base:
+            user_base = user_base.split('|')[0]
+        else:
+            user_base = ''
+        banco = self.request.get('banco')
+        tarjeta = self.request.get('tarjeta')
+        datos = get_cache(banco+tarjeta+'_datos',datos_tarjeta('SantaCruz',self.request.get('tarjeta')))
+        contenido=get_cache(banco+tarjeta+'_contenido',obtener_tarjeta_santacruz(self.request.get('tarjeta'),generar_santacruz('SantaCruz')))
+        beneficios=get_cache(banco+tarjeta+'_beneficios',obtener_beneficios(datos[0],datos[1],datos[2]))
+        content = formato_general(self.request.get('title'),contenido,beneficios)
+        self.render('generador.html',beneficios=beneficios,cont=contenido,contenido=content,user_base=user_base,url='Generador SantaCruz',link=self.request.get('link'))
+
+
 class FlushCache(Handler):
     def get(self):
         tarjeta = self.request.get('tarjeta')
@@ -519,7 +612,11 @@ app = webapp2.WSGIApplication([('/login', Login),
                                ('/generadoralnap', GeneradorALNAP),
                                ('/generadorbdi', GeneradorBDI),
                                ('/generadorademi',GeneradorAdemi),
-                               ('/_test', test),
+                               ('/generadorscotiabank',GeneradorScotiabank),
+                               ('/generadorbanreservas',GeneradorBanReservas),
+                               ('/generadorbanaci',GeneradorBANACI),
+                               ('/generadorsantacruz',GeneradorSantaCruz),
+                               ('/_ImageData', ImageData),
                                (PAGE_RE, WikiPage),
                                ],
                               debug=True)

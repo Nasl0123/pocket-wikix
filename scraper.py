@@ -5,7 +5,6 @@ sys.path.insert(0, 'libs')
 from bs4 import BeautifulSoup
 from urllib import FancyURLopener
 from indices import limpiar
-from selenium import webdriver
 
 class MyOpener(FancyURLopener):
     version = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; it; rv:1.8.1.11) Gecko/20071127 Firefox/2.0.0.11'
@@ -175,6 +174,66 @@ def datos_tarjeta(banco,tarjeta=None):
                 'signature bm cargo':['article','item-page'],
                 'crediplan':['article','item-page']
                 }
+                
+    if banco == 'Scotiabank':
+        tree = ['div','a overview content','class']
+        link = {'scotiabank gold visa':['http://www.scotiabank.com/do/es/0,,6986,00.html','http://www.scotiabank.com/do/es/0,,6988,00.html'],
+                'scotiabank mastercard':['http://www.scotiabank.com/do/es/0,,6985,00.html'],
+                'scotiabank visa':['http://www.scotiabank.com/do/es/0,,6987,00.html'],
+                'scotiabank platinum visa':['http://www.scotiabank.com/do/es/0,,6991,00.html','http://www.scotiabank.com/do/es/0,,6997,00.html'],
+                'scotiabank aadvantage visa':['http://www.scotiabank.com/do/es/0,,6992,00.html'],
+                'scotiabank aadvantage gold mastercard':['http://www.scotiabank.com/do/es/0,,6993,00.html','http://www.scotiabank.com/do/es/0,,6994,00.html'],
+                'scotiabank aadvantage platinum visa':['http://www.scotiabank.com/do/es/0,,6995,00.html'],
+                'scotiabank pricesmart diamond mastercard':['http://www.scotiabank.com/do/es/0,,6996,00.html'],
+                'scotiabank bravo visa':['http://www.scotiabank.com/do/es/0,,7154,00.html'],
+                'scotiabank orange mastercard':['http://www.scotiabank.com/do/es/0,,7155,00.html'],
+                'scotiabank visa infinite':['http://www.scotiabank.com/do/es/0,,9492,00.html']}
+
+        path = {'scotiabank gold visa':['div','bullets'],
+                'scotiabank mastercard':['div','bullets'],
+                'scotiabank visa':['div','bullets'],
+                'scotiabank platinum visa':['div','bullets'],
+                'scotiabank aadvantage visa':['div','bullets'],
+                'scotiabank aadvantage gold mastercard':['div','bullets'],
+                'scotiabank aadvantage platinum visa':['div','bullets'],
+                'scotiabank pricesmart diamond mastercard':['div','bullets'],
+                'scotiabank bravo visa':['div','bullets'],
+                'scotiabank orange mastercard':['div','bullets'],
+                'scotiabank visa infinite':['div','bullets']}
+
+    if banco == 'BanReservas':
+        tree = ['div','beneficios-previews cms-content','class']
+        link = {'visa / mastercard / mastercard multimoneda gold':['https://www.banreservas.com/products/visa-y-mastercard-gold'],
+                'mastercard platinum':['https://www.banreservas.com/products/mastercard-platinum'],
+                'visa clasica y mastercard standard':['https://www.banreservas.com/products/visa-clasica-y-mastercard-standard'],
+                'visa y mastercard multimoneda':['https://www.banreservas.com/products/visa-y-mastercard-multimoneda'],
+                'visa platinum universe':['https://www.banreservas.com/products/visa-platinum-universe'],
+                'visa infinite':['https://www.banreservas.com/products/visa-infinite']}
+        
+        path = {'visa / mastercard / mastercard multimoneda gold':['div','beneficios-preview'],
+                'mastercard platinum':['div','beneficios-preview'],
+                'visa clasica y mastercard standard':['div','beneficios-preview'],
+                'visa y mastercard multimoneda':['div','beneficios-preview'],
+                'visa platinum universe':['div','beneficios-preview'],
+                'visa infinite':['div','beneficios-preview']}
+
+    if banco == 'SantaCruz':
+        tree = ['div','article-content','class']
+        link = {'clasica':['https://www.bsc.com.do/~bsccom/soluciones-personales/tarjetas/tarjetas-de-credito/tarjeta-de-credito-clasica/'],
+                'gold':['https://www.bsc.com.do/~bsccom/soluciones-personales/tarjetas/tarjetas-de-credito/tarjeta-de-credito-gold/'],
+                'platinum':['https://www.bsc.com.do/~bsccom/soluciones-personales/tarjetas/tarjetas-de-credito/tarjeta-de-credito-platinum/'],
+                'infinite':['https://www.bsc.com.do/~bsccom/soluciones-personales/tarjetas/tarjeta-de-credito-infinite/'],
+                'multicredito':['https://www.bsc.com.do/~bsccom/soluciones-personales/tarjetas/multicredito/'],
+                'full car':['https://www.bsc.com.do/~bsccom/soluciones-personales/tarjetas/full-car/'],
+                'cecomsa':['https://www.bsc.com.do/~bsccom/soluciones-personales/tarjetas/tarjeta-cecomsa/']}
+
+        path = {'clasica':['div','entry-body'],
+                'gold':['div','entry-body'],
+                'platinum':['div','entry-body'],
+                'infinite':['div','entry-body'],
+                'multicredito':['div','entry-body'],
+                'full car':['div','entry-body'],
+                'cecomsa':['div','entry-body']}
 
     return (link.get(tarjeta),path.get(tarjeta),tree)
 
@@ -236,7 +295,7 @@ def obtener_beneficios(urls,path,tree,otros=None):
             return "Status Code %d : %s" %(statusCode,req.read())
         final += b
     if final:
-        return final.replace('<!--','').replace('-->','')
+        return final.replace('<!--','').replace('-->','').replace('<strong>','').replace('</strong','')
     else:
         return 'No se encuentran beneficios.'
 
