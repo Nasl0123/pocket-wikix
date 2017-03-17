@@ -8,6 +8,7 @@ from google.appengine.api import memcache
 import re
 import hashlib
 import urllib2
+import urllib
 import time
 from generadorPopular import obtener_tarjeta_popular,formatear_popular,generar_popular,generar_info_popular
 from generadorProgreso import obtener_tarjeta_progreso,formatear_progreso,generar_progreso
@@ -15,10 +16,16 @@ from generadorLopezDeHaro import obtener_tarjeta_lopezdeharo,formatear_lopezdeha
 from generadorACAP import obtener_tarjeta_acap,formatear_acap,generar_acap
 from generadorALNAP import obtener_tarjeta_alnap,formatear_alnap,generar_alnap
 from generadorBDI import obtener_tarjeta_bdi,formatear_bdi,generar_bdi
-from generadorAdemi import obtener_tarjeta_ademi,formatear_ademi,generar_ademi,obtener_id_ademi
-from scraper import obtener_beneficios,datos_tarjeta,beneficios_javascript
+#from generadorAdemi import obtener_tarjeta_ademi,formatear_ademi,generar_ademi
+#from scraper import obtener_beneficios,datos_tarjeta
 from indices import get_indices,formato_general,limpiar
 from google.appengine.api import urlfetch
+import json
+from process import *
+import cloudstorage as gcs
+from google.appengine.api import app_identity
+
+
 urlfetch.set_default_fetch_deadline(100)
 
 jinja_dir = os.path.join(os.path.dirname(__file__),'templates')
@@ -77,6 +84,9 @@ class User(db.Model):
     password = db.StringProperty(required=True)
     email = db.StringProperty(required=False)
 
+class Contenido(db.Model):
+    nombre = db.StringProperty(required=True)
+    contenido = db.TextProperty(required=True)
 USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
 def valid_username(username):
     if USER_RE.match(username):
@@ -464,6 +474,36 @@ class FlushCache(Handler):
         memcache.delete(banco+tarjeta+'_beneficios')
         self.redirect(self.request.get('link'))
 
+import xlrd
+class ImageData(Handler):
+    def get(self):
+        try:
+            file = db.GqlQuery("select * from Contenido where nombre='Bancamerica'")
+            book = xlrd.open_workbook(file_contents=file.contenido)
+            logging.error(book)
+        except:
+            self.render('test.html')
+
+    def post(self):
+        sourceFile = str(os.getcwd()) + "\\img\\" + self.request.get("sourceFile") + ".png"
+        language = "Spanish"
+        outputFormat = "xlsx"
+        if os.path.isfile( sourceFile ):
+            recognizeFile( sourceFile, targetFile, language, outputFormat ) 
+        else:
+            self.write("No such file: %s" % sourceFile)
+
+        from AbbyyOnlineSdk import result
+        #file = Contenido(nombre="Bancamerica",contenido=result.encode('utf-8').decode('utf-8'))
+        book = xlrd.open_workbook(file_contents=result)
+        sheet = book.sheet_by_index(0)
+
+        self.write(sheet.cell_value(15,2))
+        #file.put()
+
+
+    
+
 PAGE_RE = r'(/(?:[a-zA-Z0-9_-]+/?)*)'
 app = webapp2.WSGIApplication([('/login', Login),
                                ('/logout', Logout),
@@ -479,6 +519,7 @@ app = webapp2.WSGIApplication([('/login', Login),
                                ('/generadoralnap', GeneradorALNAP),
                                ('/generadorbdi', GeneradorBDI),
                                ('/generadorademi',GeneradorAdemi),
+                               ('/_test', test),
                                (PAGE_RE, WikiPage),
                                ],
                               debug=True)
