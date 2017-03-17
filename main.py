@@ -8,6 +8,7 @@ from google.appengine.api import memcache
 import re
 import hashlib
 import urllib2
+import urllib
 import time
 from generadorPopular import obtener_tarjeta_popular,formatear_popular,generar_popular,generar_info_popular
 from generadorProgreso import obtener_tarjeta_progreso,formatear_progreso,generar_progreso
@@ -23,6 +24,11 @@ from generadorSantaCruz import obtener_tarjeta_santacruz, formatear_santacruz, g
 from scraper import obtener_beneficios,datos_tarjeta
 from indices import get_indices,formato_general,limpiar
 from google.appengine.api import urlfetch
+import json
+from process import *
+from google.appengine.api import app_identity
+
+
 urlfetch.set_default_fetch_deadline(100)
 
 jinja_dir = os.path.join(os.path.dirname(__file__),'templates')
@@ -81,6 +87,9 @@ class User(db.Model):
     password = db.StringProperty(required=True)
     email = db.StringProperty(required=False)
 
+class Contenido(db.Model):
+    nombre = db.StringProperty(required=True)
+    contenido = db.TextProperty(required=True)
 USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
 def valid_username(username):
     if USER_RE.match(username):
@@ -557,6 +566,40 @@ class FlushCache(Handler):
         memcache.delete(banco+tarjeta+'_beneficios')
         self.redirect(self.request.get('link'))
 
+import xlrd
+class ImageData(Handler):
+    def get(self):
+        try:
+            file = db.GqlQuery("select * from Contenido where nombre='Bancamerica'")
+            book = xlrd.open_workbook(file_contents=file.contenido)
+            logging.error(book)
+        except:
+            self.render('test.html')
+
+    def post(self):
+        try:
+            sourceFile = str(os.getcwd()) + "\\img\\" + self.request.get("sourceFile") + ".png"
+            language = "Spanish"
+            targetFile = ''
+            outputFormat = "xlsx"
+            if os.path.isfile( sourceFile ):
+                recognizeFile( sourceFile, targetFile, language, outputFormat ) 
+            else:
+                self.write("No such file: %s" % sourceFile)
+
+            from AbbyyOnlineSdk import result
+            #file = Contenido(nombre="Bancamerica",contenido=result.encode('utf-8').decode('utf-8'))
+            book = xlrd.open_workbook(file_contents=result)
+            sheet = book.sheet_by_index(0)
+
+            self.write(sheet.cell_value(15,2))
+            #file.put()
+        except:
+            self.redirect('/_ImageData')
+
+
+    
+
 PAGE_RE = r'(/(?:[a-zA-Z0-9_-]+/?)*)'
 app = webapp2.WSGIApplication([('/login', Login),
                                ('/logout', Logout),
@@ -576,6 +619,7 @@ app = webapp2.WSGIApplication([('/login', Login),
                                ('/generadorbanreservas',GeneradorBanReservas),
                                ('/generadorbanaci',GeneradorBANACI),
                                ('/generadorsantacruz',GeneradorSantaCruz),
+                               ('/_ImageData', ImageData),
                                (PAGE_RE, WikiPage),
                                ],
                               debug=True)
