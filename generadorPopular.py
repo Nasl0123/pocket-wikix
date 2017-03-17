@@ -11,6 +11,13 @@ c = pdftables_api.Client('fc9wow7u2a9c')
 def crear_xlsx(banco):
     c.xlsx(banco+'.pdf', 'xlsx/'+banco+'_output.xlsx')
 
+def generar_popular(banco):
+    try:
+        a = formatear_popular(banco)
+        return a[1]
+    except:
+        None
+
 def formatear_popular(banco):
     try:
         book = xlrd.open_workbook('xlsx/'+banco+'_output.xlsx')
@@ -59,12 +66,6 @@ def limpiar(string):
     return string
 
 
-def generar_popular(banco):
-    try:
-        a = formatear_popular(banco)
-        return a[1]
-    except:
-        None
 
 def obtener_popular(inicio,final,lista=None,inde=0,pos=0):
     if not lista:
