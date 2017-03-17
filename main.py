@@ -26,7 +26,6 @@ from indices import get_indices,formato_general,limpiar
 from google.appengine.api import urlfetch
 import json
 from process import *
-import cloudstorage as gcs
 from google.appengine.api import app_identity
 
 
@@ -578,21 +577,25 @@ class ImageData(Handler):
             self.render('test.html')
 
     def post(self):
-        sourceFile = str(os.getcwd()) + "\\img\\" + self.request.get("sourceFile") + ".png"
-        language = "Spanish"
-        outputFormat = "xlsx"
-        if os.path.isfile( sourceFile ):
-            recognizeFile( sourceFile, targetFile, language, outputFormat ) 
-        else:
-            self.write("No such file: %s" % sourceFile)
+        try:
+            sourceFile = str(os.getcwd()) + "\\img\\" + self.request.get("sourceFile") + ".png"
+            language = "Spanish"
+            targetFile = ''
+            outputFormat = "xlsx"
+            if os.path.isfile( sourceFile ):
+                recognizeFile( sourceFile, targetFile, language, outputFormat ) 
+            else:
+                self.write("No such file: %s" % sourceFile)
 
-        from AbbyyOnlineSdk import result
-        #file = Contenido(nombre="Bancamerica",contenido=result.encode('utf-8').decode('utf-8'))
-        book = xlrd.open_workbook(file_contents=result)
-        sheet = book.sheet_by_index(0)
+            from AbbyyOnlineSdk import result
+            #file = Contenido(nombre="Bancamerica",contenido=result.encode('utf-8').decode('utf-8'))
+            book = xlrd.open_workbook(file_contents=result)
+            sheet = book.sheet_by_index(0)
 
-        self.write(sheet.cell_value(15,2))
-        #file.put()
+            self.write(sheet.cell_value(15,2))
+            #file.put()
+        except:
+            self.redirect('/_ImageData')
 
 
     
