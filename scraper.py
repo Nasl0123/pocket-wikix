@@ -161,7 +161,14 @@ def datos_tarjeta(banco,tarjeta=None):
                 'anthonys gold':['https://www.bdi.com.do/index.php/productos-y-servicios/tarjetas-de-credito/visa-marca-compartida/tarjeta-anthony-s'],
                 'anthonys platinum':['https://www.bdi.com.do/index.php/productos-y-servicios/tarjetas-de-credito/visa-marca-compartida/tarjeta-anthony-s'],
                 'signature bm cargo':['https://www.bdi.com.do/index.php/productos-y-servicios/tarjetas-de-credito/visa-marca-compartida/bmcargo'],
-                'crediplan':['https://www.bdi.com.do/index.php/productos-y-servicios/tarjetas-de-credito/credito-diferido']
+                'crediplan':['https://www.bdi.com.do/index.php/productos-y-servicios/tarjetas-de-credito/credito-diferido'],
+                'bm cargo local':['https://www.bdi.com.do/index.php/productos-y-servicios/tarjetas-de-credito/visa-marca-compartida/bmcargo'],
+                'bm cargo clasica':['https://www.bdi.com.do/index.php/productos-y-servicios/tarjetas-de-credito/visa-marca-compartida/bmcargo'],
+                'bm cargo gold':['https://www.bdi.com.do/index.php/productos-y-servicios/tarjetas-de-credito/visa-marca-compartida/bmcargo'],
+                'fundapec clasica':['https://www.bdi.com.do/index.php/productos-y-servicios/tarjetas-de-credito/visa-marca-compartida/tarjeta-fundapec'],
+                'plaza central clasica':['https://www.bdi.com.do/index.php/productos-y-servicios/tarjetas-de-credito/visa-marca-compartida/plaza-central'],
+                'plaza central local':['https://www.bdi.com.do/index.php/productos-y-servicios/tarjetas-de-credito/visa-marca-compartida/plaza-central'],
+                'plaza central gold':['https://www.bdi.com.do/index.php/productos-y-servicios/tarjetas-de-credito/visa-marca-compartida/plaza-central']
                 }
 
         path = {'local':['article','item-page'],
@@ -172,7 +179,14 @@ def datos_tarjeta(banco,tarjeta=None):
                 'anthonys gold':['article','item-page'],
                 'anthonys platinum':['article','item-page'],
                 'signature bm cargo':['article','item-page'],
-                'crediplan':['article','item-page']
+                'crediplan':['article','item-page'],
+                'bm cargo local':['article','item-page'],
+                'bm cargo clasica':['article','item-page'],
+                'bm cargo gold':['article','item-page'],
+                'fundapec clasica':['article','item-page'],
+                'plaza central clasica':['article','item-page'],
+                'plaza central local':['article','item-page'],
+                'plaza central gold':['article','item-page']
                 }
                 
     if banco == 'Scotiabank':
@@ -220,7 +234,7 @@ def datos_tarjeta(banco,tarjeta=None):
     if banco == 'SantaCruz':
         tree = ['div','article-content','class']
         link = {'clasica':['https://www.bsc.com.do/~bsccom/soluciones-personales/tarjetas/tarjetas-de-credito/tarjeta-de-credito-clasica/'],
-                'gold':['https://www.bsc.com.do/~bsccom/soluciones-personales/tarjetas/tarjetas-de-credito/tarjeta-de-credito-gold/'],
+                'oro':['https://www.bsc.com.do/~bsccom/soluciones-personales/tarjetas/tarjetas-de-credito/tarjeta-de-credito-gold/'],
                 'platinum':['https://www.bsc.com.do/~bsccom/soluciones-personales/tarjetas/tarjetas-de-credito/tarjeta-de-credito-platinum/'],
                 'infinite':['https://www.bsc.com.do/~bsccom/soluciones-personales/tarjetas/tarjeta-de-credito-infinite/'],
                 'multicredito':['https://www.bsc.com.do/~bsccom/soluciones-personales/tarjetas/multicredito/'],
@@ -228,12 +242,85 @@ def datos_tarjeta(banco,tarjeta=None):
                 'cecomsa':['https://www.bsc.com.do/~bsccom/soluciones-personales/tarjetas/tarjeta-cecomsa/']}
 
         path = {'clasica':['div','entry-body'],
-                'gold':['div','entry-body'],
+                'oro':['div','entry-body'],
                 'platinum':['div','entry-body'],
                 'infinite':['div','entry-body'],
                 'multicredito':['div','entry-body'],
                 'full car':['div','entry-body'],
                 'cecomsa':['div','entry-body']}
+
+    if banco == 'BHD':
+        tree = ['div','tab_container','class']
+        link = {'clasica local':['https://www.bhdleon.com.do/wps/portal/BHD/Inicio/bancapersona/Productos/!ut/p/z1/tVNdb4IwFP0r-uAjacUi9ZHsy80tJLBN6YsphWodtAgdbv_eu2XLnpQshr60zT33nJObexBDK8Q0b9WGW2U0L-CfsOmazK7xPSHjxd38FuPAffRmcRRGV3OCXhFDTGhb2S1K0m02wkorocwIp1wLPqjyugGmEba83uWWN38vUeeZsoCsapO9C2ugxp1Bqxo-EAVvFLQXRoALkKiEylBCpz7x6TRzJjijDqEydaiU0uEUS-lKV4zdMVp2eWZQxidOgKGffUNOMCxirwMQ_gLOiCRg0j9t0kfLVuUH9KJNXcIE4n_OYN6lMHMvVOig9_qkd0O_V3pCLqR_OLcfXysIuVK7_Z4FEB6jbf5h0aqv9FRlSSefzltED89yuynXTzcT7-cqNsPhEX567X4!/dz/d5/L2dBISEvZ0FBIS9nQSEh/'],
+                'standard local':['https://www.bhdleon.com.do/wps/portal/BHD/Inicio/bancapersona/Productos/!ut/p/z1/tVPLbsIwEPwVOHCMbBInJMeoL1paIUFbiC_I3hhiSuzguND-fU3VqqcQVSi-eK0dz4xWO4iiJaKKHeSGWakV27l3RqMVSa7xPSHDyd34FuPUfwyT-Ww6uxoT9IoooqBsZQuU8SIfYKkkSD3AnClgvUqY2jENsGVmKyyr_yowIpfWISuj83ew2vW41ytZbYUBZvJebZnKT8VOgzPjlCqQOcoA-xh8HnsBF7FHOAQeB8BePOQR40G0DhOBFm3WqWvjhpNi959-QxoYJvOwBTD9BZwRyZzJUbPJEVocpDiiF6VN6SYw_-cMxm0KiX-hQgt92CW9Px11Sk_IhfQP5_bjtIIuXnK739PUZUgrKz4sWnYcoqos4-DTe5vFx-d1sSlXTzdB-HPtNv3-F1d2JtI!/dz/d5/L2dBISEvZ0FBIS9nQSEh/'],
+                'clasica premia':['https://www.bhdleon.com.do/wps/portal/BHD/Inicio/bancapersona/Productos/!ut/p/z1/tVNdb4IwFP0r-OAjaYFi5ZHsy80tJLBN6Yu5lKJ1UrB0uv371WXLnpQsxr60zT33nJP2HsTQHDEFO7kEIxsFG3vP2WhBomt8T4g3vZvcYhz7j2GUpUl6NSHoFTHEuDKtWaG8WJVDLJXkshniAhQHpxW6s0xDbECvhYHu78S1KKWxyFY35Ts3ja1x19nJDhy-gU4e2rWoJRw0Wi5LlHs4qGhVFi6MKLjEp4Vb0CpygxCL0IcKe7RAsz7TzJbxkRVj28--IUcYplnYA0h-ASdEcmuSHjdJ0WwnxR69qEbX9iOyf77BpE8h8s9U6KEPL0nvJ_Si9IScSf9waj4OI2iDJdfbLYttehplxIdB84vFp63rcfDpvqXj_XO1WtaLp5sg_Nk2y8HgCz2JFF0!/dz/d5/L2dBISEvZ0FBIS9nQSEh/'],
+                'clasica internacional':['https://www.bhdleon.com.do/wps/portal/BHD/Inicio/bancapersona/Productos/!ut/p/z1/tVPLbsIwEPwVOORo2TUOSY6or7S0QoK2EF-QH0kwJU5IXGj_nu1LPUFUofhiWzs7M1rNYo4XmFuxM7lwprRiA_-ED5csuiJ3jF2Mb-MbQkb0wY9m08n0Mmb4BXPMlXWVW-FErrRHjDXKlB6RwirRq9K6ASaPOFGvUyeav5eqU20cIKu61G_KlVDTqLczjeipjWgMtBvr0toK9e0GpCplNE40i6gMpUYi0xliQkkUDiOKMhYwGko_iIjG8zbvHMrkyBkR6OdfkCMM45nfApj8Ak6IJGAyOG4ywPOdSff42ZZ1AROY_XMGcZtCRM9UaKH3u6Snk6BTesbOpL8_lY_PCMJ-mfV2y0ewRCVk_d3hRddbVBVFOPhAr9Nw_5St8mL5eD3wf65N3u8fAIh6K2o!/dz/d5/L2dBISEvZ0FBIS9nQSEh/'],
+                'standard internacional':['https://www.bhdleon.com.do/wps/portal/BHD/Inicio/bancapersona/Productos/!ut/p/z1/vVPLbsIwEPwVOHCMbBIHkyPqi5ZWSNAW4gtabAOmxAmOC-3fd-lDPYWoQtQXr73jmfVqlggyJcLCzizBm9zCBs-p6MxYcklvGWsPbvrXlPbC-zgZj4ajiz4jz0QQIa0v_Iqk85VqUWONNHmLzsFKaBTalcjUoh7cWnsofyPptDIekYXL1av0OeZ00Mig9NpJcKpRerDqEBiLVxbkV1GoWEijSBpG7XaXdniwYKEKGHSSAGIJwUJFHPg84TpWZFL3BYFpWrF6FN-LT0gFw2Ac1wCGP4AjIikWyauL5GSyM3pPnmzuMuzA-I896NcpJOGJCjX08TnpwyE_Kz1jJ9LfHfPHwYI4Zma93YoezlKOXn_zZPpPw1RkWTd6D15G3f3jYrXMZg9XUfy9bZbN5gdcBKLW/dz/d5/L2dBISEvZ0FBIS9nQSEh/'],
+                'mi pais':['https://www.bhdleon.com.do/wps/portal/BHD/Inicio/bancapersona/Productos/!ut/p/z1/tZNdb8IgFIb_Sr3wsgFbOuSy2Vc3tzTRbVpuDAXa4izUlun274fLll1pszi5gZPz8rwncA6gYAGoZltVMquMZmsXZ_RiicgVvENoNLlNbiCMg4eIzKbp9DJB4AVQQLm2ja1AlldiCJVWXJkhzJnmzGtk2znSEFrWrqRl3e-Jt1Io65RNa8Qbt8blCt_bqo55tfIapro9vOFKgAwiIfE4Zz4PRpGPMMQ-gYT5IoQ5KaQg4agA875qqUvDAyuG7j79khwgTGZRjyD9ERwxyVyR-HCRGMy3Su7AszZt7X5g9sc3SPocSHCiQw8-Oic-SPFZ8QidiL8_1h_7FnQTpVabDY3d2Bht5bsFi_-fm6aux-GH_zod756KqqyXj9dh9L2ty8HgEwp3v34!/dz/d5/L2dBISEvZ0FBIS9nQSEh/'],
+                'gold internacional':['https://www.bhdleon.com.do/wps/portal/BHD/Inicio/bancapersona/Productos/!ut/p/z1/tZNdT4MwFIb_CrvgkrR2ZcAl8Ws6zZKhbvRmKW2FTmgZVKb_fp3ReMWImetNe3LePufNyTmAgBUginYyp0ZqRUsbp2SyxtEVvMP4YnY7vYEwRg9-lCzmi8spBi-AAMKUqU0B0qzgLpRKMqldmFHFqFOLprUkFxrabISh7e-LNYJLY5V1o_k7M9rmCs_pZEudXJf8QK6Z5CBFEcIiRJGHeUY9a4R7kc-QFwrGJihj_iTLwHLIKrFp2HNiaP-TL0kPYZb4A4L5j-BIkdSaDPpNBmDZSbEDz0o3lW1_8sceTIcqROjECgN4_5x4NA_Oisf4RPz9sfk4jKBdJ7nZbklsd0YrIz4MWP3z0tRVFY4_vbdFuHt6LfJq_Xg99r-vMh-N9pNYYm4!/dz/d5/L2dBISEvZ0FBIS9nQSEh/','https://www.bhdleon.com.do/wps/portal/BHD/Inicio/bancapersona/Productos/!ut/p/z1/tZPLbsIwEEV_BRYsLbvEeS1RX2lphQRtId4gv0hMEzsYF9q_x1StuoKoQvHGHs31uSN7BhK4gETTnSqoU0bTysc5iZY4vUEPGF-N77M7hEbDpzCdTSfT6wzDN0gg4do1roQ5K8UAKa24MgPEqOa010i79aQBctSupaPbvxO3UijnlY014oM743MK9Gq6ddJyakWvMJU48huuBMyTgDMWRTGgIUMAYy4BQ3EKIiHCBEUJ4sEKztsKJj6NTqwR8vfJt-QEYTwLWwSTX8EZk9wXGZ8uMobznZJ7-KqNrf0nzP75BlmbQzq80KEFH3aJH07iTvEYX4h_PNcfxxb0Q6XWmw0Z-ckx2slPBxedjE5T10nwBd6nyf5lVRb18vk2CH-2quj3Dwq5ONc!/dz/d5/L2dBISEvZ0FBIS9nQSEh/'],
+                'gold mujer':['https://www.bhdleon.com.do/wps/portal/BHD/Inicio/bancapersona/Productos/!ut/p/z1/tVNdb8IgFP0r9cHHBtbSlj6afbm5pUndh-XFUMBK10JF1O3fi8uWPWmzGHngI_fccy5wDyBgBoiiW1lRK7WijTsXJJ6j9AY-IHQ1uR_fQTgKnqJ0mmf59RiBN0AAYcp2dgmKcsmHUCrJpB7CkipGvU6YtWMaQktNLSxd_-2YEVxah-yM5htmtYvVvtfStRWGUcO9Sjfcaze1MAeVjkkOijRKwzKOY7_EZeCjgKc-5m4KMcbxgpUMRgl47yubuDA8MkbQ5ZNvyBGGyTTqAWS_gBMihSsyOV6ku8VWih14Vdq07ium_3yDcZ9CGpyp0EMfXZI-yJKL0iN0Jv3jqf44tKCzlqxXKzJy_tHKik8LZhc0UNe2OPzyP3K8e1ksq3b-fBtGP0tTDQZ76p2o8g!!/dz/d5/L2dBISEvZ0FBIS9nQSEh/'],
+                'gold premia':['https://www.bhdleon.com.do/wps/portal/BHD/Inicio/bancapersona/Productos/!ut/p/z1/tZNdb4IwFIb_Cl54SVqhfF2afbG5hQS2qb0xpS1QhRah0-3fW5ctu1KyGHvTnpy3z3vSngMwWAAsyU6URAslSW3iJfZXKLqFjwhNZg_xPYRT59mLsjRJb2IE3gEGmErd6gos84qNoZCCCjWGOZGUWC3vekMaQ026Ndek_zvRjjOhjbLtFPugWpncxrZ2oidWqWpmtR1vBDkatFQwgy-gDylnNstDZiM3D2wCaWQXnBRBOGEu8RmYD1WMTRqeWFNo7uNvyQnCLPMGBMmv4IzJ0hQZnC4yAPOd4HvwJlXXmF_I_vkG8ZBD5FzoMID3rol3kuCqeIQuxD-d649jC5qpEuvtFk_N6Cip-acGi-vMTts0oftlb9Jw_1pUZbN6uXO9n60uR6MDGp_Hpw!!/dz/d5/L2dBISEvZ0FBIS9nQSEh/'],
+                'mlb':['https://www.bhdleon.com.do/wps/portal/BHD/Inicio/bancapersona/Productos/!ut/p/z1/tVPLbsIwEPyVcOAY2QSnSY5RX7S0QoK2EF_Q-kEwTexgXGj_HlO16gmiCuGLvdrxzMjeQRTNENWwVSU4ZTRUvi7o1ZxkN_iBkN7wfnCHcR49xdlkPBpfDwh6QxRRrl3jlqhgS9HFSiuuTBcz0ByCRtqNZ-piB3YlHWz-TtxKoZxHNtaID-6M71VhUMPGScvBiqA0lQjqih00Gq4EKhKcAunzRdhLGQ4JEBICExBGLMO9LJYZi2I0bTNNfRsfWTn29-k35AjDcBK3AEa_gBMihTeZHDeZoOlWyR161cbW_iMm_3yDQZtCFp2p0EIfX5I-GiUXpSfkTPrHU_NxGEEfLLVar2nu02O0k58OzS4Wn6au0_5X-D5Ody-LZVnPn2_78c9WlZ3OHrsfpoM!/dz/d5/L2dBISEvZ0FBIS9nQSEh/'],
+                'beisbol invernal':['https://www.bhdleon.com.do/wps/portal/BHD/Inicio/bancapersona/Productos/!ut/p/z1/vVNbT8IwGP0r44FEH5Z2o2Pb4-INRUMCKqwvpDehuLajq6D_3mI0PsFiCPalbb7Tc07b7wAMZgBrspEL4qTRpPL7EvfnKL-EtwhFw5vBNYRFfJ_kk_FofDFA4BlggJl2tVuCki55F0otmTRdSIlmJKiFbTxTFzpiV8KR5nfFrODSeWRtDX9jzviaCgNFGicsI5YHVMiGmiqQeiOstxOcVZIbdb7TrJnkoOyjGKZRLw4zSlGIBExDmjAYpjDLeIRYLPIITNsugX0Z7hkF9OfxF2QPw3CStABGP4ADIqU3me43mYLpRooteNLGKv8xkz--waBNIY-PVGihT05JH4_Sk9IjdCT93aH-2LWgD5pcrde48Gky2ol3B2b_Fqdaqaz3Eb6Os-3jy3Kh5g9XveR7qhadzieykykF/dz/d5/L2dBISEvZ0FBIS9nQSEh/'],
+                'platinum':['https://www.bhdleon.com.do/wps/portal/BHD/Inicio/bancapersona/Productos/!ut/p/z1/tZNdb4IwFIb_il5wSVqgKFySfbG5xQS3Kb0xtRSog4JQdfv3Hpctu0KyGHrTnpy3z3nTnoMoWiGq2EFmTMtKsQLimE7WxL_Fj4RYs4fwHuPAfnb9RTSPbkKC3hFFlCtd6xzFmzwxsFSSy8rAG6Y4G9WiaYFkYM2ardCs_TvxRiRSg7JuqmTPdQW52hwdZAvXCnCg9uWZXnOZoNifJI5lW64pEj81icMtk6UCQ8i81MeejW0XLfvsUkjjjhVguE-_JR2E2cLtEcx_BReKxGBy2m1yipYHKY7oTVVNCV-w-OcbhH0VfPvKCj14d0i8PZ8OiifkSvzTpf44tyCMlNzudjSAuamUFp8arQYYnLosPefL_Ii842uaZ-X65c5xf7YiG49PbZqOlg!!/dz/d5/L2dBISEvZ0FBIS9nQSEh/'],
+                'black mujer':['https://www.bhdleon.com.do/wps/portal/BHD/Inicio/bancapersona/Productos/!ut/p/z1/tVNdb4IwFP0r-OAjacEy4JHsi80tJrpN6Yu5tEWqUrBU3f69ddmyJyWLsS_tzT0956S9B1E0Q1TBTi7AyFrB2tYZvZmT-A4_EeINH9MHjBP_JYgn49H4NiXoA1FEmTKNKVGWl7yPpZJM1n2cg2LgNEK3lqmPDeilMND-nZgWXBqLbHTNt8zUtte6TgWtEZqB5k6-BrZyqu1S6KNMwyRHmQARe14IbhRD4RIfQjcqAnB9zrzIw0U-iDmadvmmto1PrATb-_QbcoJhOAk6AKNfwBmRzJoMT5sM0XQnxR69q1pX9i8m_3yDtEsh9i9U6KAPrknvj8Kr0hNyIf3zufk4jqDNllxuNjSxAaqVEZ8Gza6ZoKaqosGXuxpH-7eiXFTz1_tB8LOtF73eAeIg9ag!/dz/d5/L2dBISEvZ0FBIS9nQSEh/'],
+                'siremas oro':['https://www.bhdleon.com.do/wps/portal/BHD/Inicio/bancapersona/Productos/!ut/p/z1/tVNbb4IwGP0r-OAjacEi8Eh2Y3MLCW5T-mJKqVAnLZaK27-3Llv2hGQx9qGXfKfnnLTfARgsARak4yXRXAqyNecMT1covIWPCDmzh_gewsh99sJ5mqQ3MQLvAANMhW50BbK8KsaQC065HMOcCEqshqnWMI2hJmrDNGn_dlSxgmuDbJQs9lRLU9vbVsdbYrVcsZq0llTyJNBQXoDMcdnUgfnaJqcJEeLZgZO7NoQBoiHLc8ehYDHkGJsy7BkRNPfxN6SHYTb3BgDJL-CMSGZM-v0mfbDoODuANyFVbX5h_s83iIcUQvdChQF675r0buJflR6hC-mfzvXHqQVNqvhmt8ORiY4Umn1qsLxOdpq6DiZf9kcaHF7XVVmvXu4m3s-yLUejI-t56Fk!/dz/d5/L2dBISEvZ0FBIS9nQSEh/'],
+                'la cadena':['https://www.bhdleon.com.do/wps/portal/BHD/Inicio/bancapersona/Productos/!ut/p/z1/tZNdb4IwFIb_Cl54SVqhFbgk-3JzC4luU3pjjm3ROiiIHW7_fnXZsiski6E37cl5-7wn7TmIoSViGhq1AaNKDbmNUzZekega3xMymt5NbjGOvUcazWfJ7GpC0CtiiHFtKrNF6XorhlhpxVU5xGvQHJxK1gdLGmID9U4aOPydeC2FMlZZ1aV456Y85VynUQdwcnA4CKnhhK-4EiglYhSCBHDDMPBdkvmeG0V07GKfg59RKnjmoUVXvcymccuKsb3PviUthOmcdgiSX8EZk9QWGbQXGaBFo-QRveiyLuwfzP_5BpMuh8i70KEDT_vEe0nQK56QC_EP5_rj1IJ2ptRuv2exHZxSG_lh0LKPyamKIvQ_3bdZeHzOtpti9XTj058t3wwGX0IaDcs!/dz/d5/L2dBISEvZ0FBIS9nQSEh/'],
+                'platinum mujer':['https://www.bhdleon.com.do/wps/portal/BHD/Inicio/bancapersona/Productos/!ut/p/z1/tVNdb8IgFP0r9cHHBqS0lcdmX93cYqLbtLwYStHihFaKuv17cdmyJ20WU17g5h7OOYF7AAVzQDXbyxWzstJs4-qMRgtMbuEjxoPRQ3oPYYKeQzKdjCc3KQbvgALKta1tCbK8LPpQasll1Yc505x5tTCNY-pDy8xaWNb8nbgRhbQOWZuq2HFbud7W9xRrrDCcmcKrN86H3ilP7dbCnJRqLguQBWQpch5HPonjwMcCcT8vlsIfBBFCIiQkGiAwa7NOXRueWQl09-k35AzDaBq2AMa_gAsimTMZnzcZg9leigN405VR7jum_3yDtE2BoCsVWujDLunROO6UHuMr6Z8uzcdpBF285Hq7pYnLUKWt-LRg3nGIaqWGwZf_MRkeXpflSi1e7oLwZ9user0j9HdKRQ!!/dz/d5/L2dBISEvZ0FBIS9nQSEh/'],
+                'infinite':['https://www.bhdleon.com.do/wps/portal/BHD/Inicio/bancapersona/Productos/!ut/p/z1/tZNdT4MwFIb_CrvgkrRCkfaS-IVOQwLqRm-WjnbQOQqDyvTf2xmNV4yYhd60J-ft85605wAKloAq1suCaVkrtjNxRi9XiFzDe4Qu5nfRLYSh--iTNImTqwiBV0ABzZVudAmydcltKJXMZW3DNVM5sxrRdoZkQ83ardCs-zvlreBSG2XT1vw917XJtY7Vy45ZUm0MR4sjvcklBxn3XA4ZYo6HA99BGHoOI4Q43IUIC1cIQTBYjJVLTRoOrBCa-_RbMkCYp_6IIP4VnDDJTJHBcJEBWPRSHMCLqtvKfEH6zzeIxhyIe6bDCN6fEu_GwaR4hM7EP5zqj2MLmpGS2_2ehmZuaqXFhwbLCQanqSrsfTpvCT48b8qiWj3deP7Ptitmsy-IVfzf/dz/d5/L2dBISEvZ0FBIS9nQSEh/']
+                }
+
+        path = {'clasica local':['div','tab2','id'],
+                'standard local':['div','tab2','id'],
+                'clasica premia':['div','tab2','id'],
+                'clasica internacional':['div','tab2','id'],
+                'standard internacional':['div','tab2','id'],
+                'mi pais':['div','tab2','id'],
+                'gold internacional':['div','tab2','id'],
+                'gold mujer':['div','tab2','id'],
+                'gold premia':['div','tab2','id'],
+                'mlb':['div','tab2','id'],
+                'beisbol invernal':['div','tab2','id'],
+                'platinum':['div','tab2','id'],
+                'black mujer':['div','tab2','id'],
+                'siremas oro':['div','tab2','id'],
+                'la cadena':['div','tab2','id'],
+                'platinum mujer':['div','tab2','id'],
+                'infinite':['div','tab2','id']
+                }
+
+    if banco == 'Bancamerica':
+        tree = ['section','beneficio','class']
+        link = {'clasica':['http://bancamerica.com.do/banca_personal/visa_clsica_bancamrica'],
+                'gold':['http://bancamerica.com.do/banca_personal/visa_gold_bancamrica'],
+                'platinum':['http://bancamerica.com.do/banca_personal/visa_platinum_bancamrica'],
+                'signature':['http://bancamerica.com.do/banca_personal/visa_signature_bancamrica']}
+
+        path = {'clasica':['div','container'],
+                'platinum':['div','container'],
+                'gold':['div','container'],
+                'signature':['div','container']
+                }
+
+    if banco == 'Vimenca':
+        c = {'clasica local':'clasica-local',
+             'clasica int':'clasica-internacional',
+             'gold':'gold-internacional',
+             'black gold':'black-gold-internacional',
+             'platinum':'platinum-internacional',
+             'gold pagatodo':'gold-pagatodo'}
+        tree = ['div','yoo-zoo blog-uikit blog-uikit-tarjeta-de-credito-visa-'+c[tarjeta],'class']
+        link = {'clasica int':['http://www.bancovimenca.com/portal/tarjetas/tarjeta-de-credito-visa-clasica-internacional'],
+                'clasica local':['http://www.bancovimenca.com/portal/tarjetas/tarjeta-de-credito-visa-clasica-local'],
+                'gold':['http://www.bancovimenca.com/portal/tarjetas/tarjeta-de-credito-visa-gold-internacional'],
+                'black gold':['http://www.bancovimenca.com/portal/tarjetas/tarjeta-de-credito-visa-black-gold-internacional'],
+                'platinum':['http://www.bancovimenca.com/portal/tarjetas/tarjeta-de-credito-visa-platinum-internacional']}
+
+        path = {'clasica int':['article','uk-article'],
+                'clasica local':['article','uk-article'],
+                'gold':['article','uk-article'],
+                'black gold':['article','uk-article'],
+                'platinum':['article','uk-article']}
 
     return (link.get(tarjeta),path.get(tarjeta),tree)
 

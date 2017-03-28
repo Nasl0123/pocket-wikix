@@ -46,9 +46,14 @@ def obtener_tarjeta_bdi(tarjeta,info):
             resultado['emision'] = lista[1]
             resultado['renovacion'] = lista[3]
             resultado['seguro_proteccion'] = lista[7]
-            resultado['tasa_interes'] = 'RD$'+lista[9].split('-')[1]+'/USD$'+lista[10].split('-')[1]
-            resultado['comision_mora'] = 'RD$'+lista[11].split('-')[0]+'/USD$'+lista[12].split('-')[0]
-            resultado['sobregiro'] = 'RD$'+lista[13].split('-')[0]+'/USD$'+lista[14].split('-')[0]
+            if 'local' in tarjeta:
+                resultado['tasa_interes'] = 'RD$'+lista[9].split('-')[1]
+                resultado['comision_mora'] = 'RD$'+lista[11].split('-')[0]
+                resultado['sobregiro'] = 'RD$'+lista[13].split('-')[0]
+            else:
+                resultado['tasa_interes'] = 'RD$'+lista[9].split('-')[1]+'/USD$'+lista[10].split('-')[1]
+                resultado['comision_mora'] = 'RD$'+lista[11].split('-')[0]+'/USD$'+lista[12].split('-')[0]
+                resultado['sobregiro'] = 'RD$'+lista[13].split('-')[0]+'/USD$'+lista[14].split('-')[0]
             resultado['avance_efectivo'] = lista[15]+'%'
             break
     return resultado

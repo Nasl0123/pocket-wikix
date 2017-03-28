@@ -21,6 +21,9 @@ from generadorScotiabank import obtener_tarjeta_scotiabank, formatear_scotiabank
 from generadorBanReservas import obtener_tarjeta_banreservas, formatear_banreservas, generar_banreservas
 from generadorBANACI import obtener_tarjeta_banaci, formatear_banaci, generar_banaci, beneficios_banaci
 from generadorSantaCruz import obtener_tarjeta_santacruz, formatear_santacruz, generar_santacruz
+from generadorBHD import obtener_tarjeta_bhd, formatear_bhd, generar_bhd
+from generadorBancamerica import formatear_bancamerica,generar_bancamerica,obtener_tarjeta_bancamerica
+from generadorVimenca import formatear_vimenca, generar_vimenca, obtener_tarjeta_vimenca
 from scraper import obtener_beneficios,datos_tarjeta
 from indices import get_indices,formato_general,limpiar
 from google.appengine.api import urlfetch
@@ -549,6 +552,76 @@ class GeneradorSantaCruz(Handler):
         content = formato_general(self.request.get('title'),contenido,beneficios)
         self.render('generador.html',beneficios=beneficios,cont=contenido,contenido=content,user_base=user_base,url='Generador SantaCruz',link=self.request.get('link'))
 
+class GeneradorBHD(Handler):
+    def get(self):
+        user_base = self.request.cookies.get('user_id')
+        if user_base:
+            user_base = user_base.split('|')[0]
+        else:
+            user_base = ''
+        self.render('generador.html',user_base=user_base,url='Generador BHD')
+    def post(self):
+        user_base = self.request.cookies.get('user_id')
+        if user_base:
+            user_base = user_base.split('|')[0]
+        else:
+            user_base = ''
+        banco = self.request.get('banco')
+        tarjeta = self.request.get('tarjeta')
+        datos = get_cache(banco+tarjeta+'_datos',datos_tarjeta('BHD',self.request.get('tarjeta')))
+        contenido=get_cache(banco+tarjeta+'_contenido',obtener_tarjeta_bhd(self.request.get('tarjeta'),generar_bhd('BHD')))
+        beneficios=get_cache(banco+tarjeta+'_beneficios',obtener_beneficios(datos[0],datos[1],datos[2]))
+        content = formato_general(self.request.get('title'),contenido,beneficios)
+        self.render('generador.html',beneficios=beneficios,cont=contenido,contenido=content,user_base=user_base,url='Generador BHD',link=self.request.get('link'))
+
+class GeneradorVimenca(Handler):
+    def get(self):
+        user_base = self.request.cookies.get('user_id')
+        if user_base:
+            user_base = user_base.split('|')[0]
+        else:
+            user_base = ''
+        self.render('generador.html',user_base=user_base,url='Generador Vimenca')
+    def post(self):
+        user_base = self.request.cookies.get('user_id')
+        if user_base:
+            user_base = user_base.split('|')[0]
+        else:
+            user_base = ''
+        banco = self.request.get('banco')
+        tarjeta = self.request.get('tarjeta')
+        datos = get_cache(banco+tarjeta+'_datos',datos_tarjeta('Vimenca',self.request.get('tarjeta')))
+        contenido=get_cache(banco+tarjeta+'_contenido',obtener_tarjeta_vimenca(self.request.get('tarjeta'),generar_vimenca('Vimenca')))
+        beneficios=get_cache(banco+tarjeta+'_beneficios',obtener_beneficios(datos[0],datos[1],datos[2]))
+        content = formato_general(self.request.get('title'),contenido,beneficios)
+        self.render('generador.html',beneficios=beneficios,cont=contenido,contenido=content,user_base=user_base,url='Generador Vimenca',link=self.request.get('link'))
+
+
+class GeneradorBancamerica(Handler):
+    def get(self):
+        user_base = self.request.cookies.get('user_id')
+        if user_base:
+            user_base = user_base.split('|')[0]
+        else:
+            user_base = ''
+        self.render('generador.html',user_base=user_base,url='Generador Bancamerica')
+    def post(self):
+        user_base = self.request.cookies.get('user_id')
+        if user_base:
+            user_base = user_base.split('|')[0]
+        else:
+            user_base = ''
+        banco = self.request.get('banco')
+        tarjeta = self.request.get('tarjeta')
+        datos = get_cache(banco+tarjeta+'_datos',datos_tarjeta('Bancamerica',self.request.get('tarjeta')))
+        file = list(db.GqlQuery("select * from Contenido where nombre='Bancamerica'"))
+        if len(file)>0:
+            contenido=get_cache(banco+tarjeta+'_contenido',obtener_tarjeta_bancamerica(self.request.get('tarjeta'),eval(file[0].contenido)))
+            beneficios=get_cache(banco+tarjeta+'_beneficios',obtener_beneficios(datos[0],datos[1],datos[2]))
+            content = formato_general(self.request.get('title'),contenido,beneficios)
+            self.render('generador.html',beneficios=beneficios,cont=contenido,contenido=content,user_base=user_base,url='Generador Bancamerica',link=self.request.get('link'))
+        else:
+            self.redirect('/_ImageData?sourceFile=Bancamerica&url='+self.request.get('link'))
 
 class FlushCache(Handler):
     def get(self):
@@ -569,33 +642,59 @@ class FlushCache(Handler):
 import xlrd
 class ImageData(Handler):
     def get(self):
-        try:
-            file = db.GqlQuery("select * from Contenido where nombre='Bancamerica'")
-            book = xlrd.open_workbook(file_contents=file.contenido)
-            logging.error(book)
-        except:
+        if self.request.get('sourceFile'):            
+            if True:
+                banco = self.request.get("sourceFile")
+                sourceFile = "img/" + banco + ".png"
+                language = "Spanish"
+                targetFile = ''
+                outputFormat = "xlsx"
+                file = list(db.GqlQuery("select * from Contenido where nombre='"+banco+"'"))
+                if len(file)==0:
+                    if os.path.isfile( sourceFile ):
+                        recognizeFile( sourceFile, targetFile, language, outputFormat ) 
+                    else:
+                        self.write("No such file: %s" % sourceFile)
+
+                    from AbbyyOnlineSdk import result
+                    #file = Contenido(nombre="Bancamerica",contenido=result.encode('utf-8').decode('utf-8'))
+                    result = str(eval('formatear_'+banco.lower()+'(result)'))
+                    ob = Contenido(nombre=banco,contenido=result)
+                    ob.put()
+                    self.redirect(self.request.get('url'))
+                else:
+                    result = file[0].contenido
+                    self.redirect(self.request.get('url'))
+            else:
+                self.redirect('/_')
+        else:
             self.render('test.html')
 
     def post(self):
         try:
-            sourceFile = str(os.getcwd()) + "\\img\\" + self.request.get("sourceFile") + ".png"
+            banco = self.request.get("sourceFile")
+            sourceFile = str(os.getcwd()) + "\\img\\" + banco + ".png"
             language = "Spanish"
             targetFile = ''
             outputFormat = "xlsx"
-            if os.path.isfile( sourceFile ):
-                recognizeFile( sourceFile, targetFile, language, outputFormat ) 
+            file = list(db.GqlQuery("select * from Contenido where nombre='"+banco+"'"))
+            if len(file)==0:
+                if os.path.isfile( sourceFile ):
+                    recognizeFile( sourceFile, targetFile, language, outputFormat ) 
+                else:
+                    self.write("No such file: %s" % sourceFile)
+
+                from AbbyyOnlineSdk import result
+                #file = Contenido(nombre="Bancamerica",contenido=result.encode('utf-8').decode('utf-8'))
+                result = str(eval('formatear_'+banco.lower()+'(result)'))
+                ob = Contenido(nombre=banco,contenido=result)
+                ob.put()
+                self.redirect('/')
             else:
-                self.write("No such file: %s" % sourceFile)
-
-            from AbbyyOnlineSdk import result
-            #file = Contenido(nombre="Bancamerica",contenido=result.encode('utf-8').decode('utf-8'))
-            book = xlrd.open_workbook(file_contents=result)
-            sheet = book.sheet_by_index(0)
-
-            self.write(sheet.cell_value(15,2))
-            #file.put()
+                result = file[0].contenido
+                self.redirect('/')
         except:
-            self.redirect('/_ImageData')
+            self.redirect('/_I')
 
 
     
@@ -619,6 +718,9 @@ app = webapp2.WSGIApplication([('/login', Login),
                                ('/generadorbanreservas',GeneradorBanReservas),
                                ('/generadorbanaci',GeneradorBANACI),
                                ('/generadorsantacruz',GeneradorSantaCruz),
+                               ('/generadorbhd',GeneradorBHD),
+                               ('/generadorbancamerica',GeneradorBancamerica),
+                               ('/generadorvimenca',GeneradorVimenca),
                                ('/_ImageData', ImageData),
                                (PAGE_RE, WikiPage),
                                ],

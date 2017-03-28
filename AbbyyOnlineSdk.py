@@ -14,6 +14,7 @@ import urllib2
 import urllib
 import xml.dom.minidom
 import logging
+from google.appengine.api import memcache
 
 class ProcessingSettings:
 	Language = "English"
