@@ -30,9 +30,10 @@ from google.appengine.api import urlfetch
 import json
 from process import *
 from google.appengine.api import app_identity
+from generadorBanesco import *
 
 
-urlfetch.set_default_fetch_deadline(100)
+urlfetch.set_default_fetch_deadline(45)
 
 jinja_dir = os.path.join(os.path.dirname(__file__),'templates')
 jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(jinja_dir))
@@ -623,6 +624,63 @@ class GeneradorBancamerica(Handler):
         else:
             self.redirect('/_ImageData?sourceFile=Bancamerica&url='+self.request.get('link'))
 
+class GeneradorBanesco(Handler):
+    def get(self):
+        file = db.GqlQuery("select * from Contenido where nombre='Banesco'").fetch(1)
+        if file != []:
+            contenido = file[0].contenido
+            rows = {}
+            row = 1
+            while contenido.find(",") != -1:
+                fila = []
+                for e in range(0,5):
+                    fila.append(contenido[0:contenido.find(",")])
+                    contenido = contenido.replace(contenido[0:contenido.find(",")+1],"", 1)
+                rows["fila"+str(row)] = fila
+                row += 1
+            rows2 = {}
+            for e in rows:
+                if not (rows[e].count("RD$ 0") >= 5):
+                    rows2[e] = rows[e]
+                if rows[e][3].count("RD$") > 1:
+                    val1 = "RD$" + rows[e][3].split("RD$")[1]
+                    val2 = "RD$" + rows[e][3].split("RD$")[2]
+                    val3 = rows2[e][4]
+                    rows2[e][3] = val1
+                    rows2[e][4] = val2 + "," + val3
+                if rows[e][3].count("%") > 1:
+                    val1,val2 = rows[e][3].split("%")[0] + "%", rows[e][3].split("%")[1] + "%"
+                    val3 = rows[e][4]
+                    rows[e][3] = val1
+                    rows[e][4] = val2 + "," + val3
+
+
+            efectivo = rows2["fila53"][2].split()[2]
+            for e in range(0,5):
+                rows2["fila53"][e] = efectivo
+                if e == 4:
+                    rows2["fila53"][e] = efectivo + "," + efectivo
+            logging.error(e)
+            tarjetas = {"clasica":{},"gold":{},"platinum":{},"infinite":{},"flotilla":{"personal":{},"empresarial":{}},"empresarial":{}}
+            positions = {"clasica":0,"gold":1,"platinum":2,"infinite":3,"flotilla":4,"empresarial":5,"flotilla_personal":0,"flotilla_empresarial":1}
+            final = agregar_valores(rows2,tarjetas,positions)
+            self.write(final)
+
+            
+
+
+
+        
+
+
+
+
+
+
+        
+        
+
+
 class FlushCache(Handler):
     def get(self):
         tarjeta = self.request.get('tarjeta')
@@ -644,8 +702,11 @@ class ImageData(Handler):
     def get(self):
         if self.request.get('sourceFile'):            
             if True:
+                ext = ".png"
                 banco = self.request.get("sourceFile")
-                sourceFile = "img/" + banco + ".png"
+                if banco == "Banesco":
+                    ext = ".jpg"
+                sourceFile = "img/" + banco + ext
                 language = "Spanish"
                 targetFile = ''
                 outputFormat = "xlsx"
@@ -671,30 +732,32 @@ class ImageData(Handler):
             self.render('test.html')
 
     def post(self):
-        try:
-            banco = self.request.get("sourceFile")
-            sourceFile = str(os.getcwd()) + "\\img\\" + banco + ".png"
-            language = "Spanish"
-            targetFile = ''
-            outputFormat = "xlsx"
-            file = list(db.GqlQuery("select * from Contenido where nombre='"+banco+"'"))
-            if len(file)==0:
-                if os.path.isfile( sourceFile ):
-                    recognizeFile( sourceFile, targetFile, language, outputFormat ) 
-                else:
-                    self.write("No such file: %s" % sourceFile)
-
-                from AbbyyOnlineSdk import result
-                #file = Contenido(nombre="Bancamerica",contenido=result.encode('utf-8').decode('utf-8'))
-                result = str(eval('formatear_'+banco.lower()+'(result)'))
-                ob = Contenido(nombre=banco,contenido=result)
-                ob.put()
-                self.redirect('/')
+    
+        banco = self.request.get("sourceFile")
+        ext = ".png"
+        if banco == "Banesco":
+            ext = ".jpg"
+        sourceFile = str(os.getcwd()) + "\\img\\" + banco + ext
+        language = "Spanish"
+        targetFile = ''
+        outputFormat = "xlsx"
+        file = list(db.GqlQuery("select * from Contenido where nombre='"+banco+"'"))
+        if len(file)==0:
+            if os.path.isfile( sourceFile ):
+                recognizeFile( sourceFile, targetFile, language, outputFormat ) 
             else:
-                result = file[0].contenido
-                self.redirect('/')
-        except:
-            self.redirect('/_I')
+                self.write("No such file: %s" % sourceFile)
+
+            from AbbyyOnlineSdk import result
+            result = str(eval('formatear_'+banco.lower()+'(result)'))
+            ob = Contenido(nombre=banco,contenido=result)
+            ob.put()
+            self.redirect('/_ImageData')
+            
+        else:
+            result = file[0].contenido
+            #self.redirect('/_ImageData')
+            self.write(result)
 
 
     
@@ -722,6 +785,7 @@ app = webapp2.WSGIApplication([('/login', Login),
                                ('/generadorbancamerica',GeneradorBancamerica),
                                ('/generadorvimenca',GeneradorVimenca),
                                ('/_ImageData', ImageData),
+                               ('/generadorbanesco', GeneradorBanesco),
                                (PAGE_RE, WikiPage),
                                ],
                               debug=True)
