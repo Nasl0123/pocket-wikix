@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<button id="applyMask" style="float:right" onclick="DrawMask(starts,ends);">Dibujar Mascara</button>
+<button id="clearDraw" style="float:right" onclick="DeleteDrawing();">Limpiar</button>
+<button id="cambiarLinea" style="float:right" onclick="CambiarLinea();">Vertical/Horizontal</button>
+<button id="downloadResult" style="float:right" onclick="convertCanvasToImage(canvas);">Convertir Imagen</button>
+<input type="file" id="file_input" style="float:right">
+<canvas id="myCanvas" style="border:1px solid #d3d3d3;">
+
+</canvas>
+
+
+<script>
+line = "horizontal"
+
+document.addEventListener("DOMContentLoaded", init, false);
+function init(){
+	var file_input = document.getElementById("file_input")
+	first_x = 0;
+	first_y = 0;
+	starts = [];
+	ends = [];
+	vertical_start=[];
+	horizontal_start=[];
+    canvas = document.getElementById("myCanvas");
+    canvas.addEventListener("click", getPosition, false);
+    canvas.height = 1500;
+    canvas.width = 1200;
+
+   	ctx = canvas.getContext("2d");
+   	ctx.beginPath();
+   	ctx.lineWidth=2.4;
+   	canvas.addEventListener('contextmenu', function(ev){
+   		ev.preventDefault();
+   		var x = new Number();
+		var y = new Number();
+		var canvas = document.getElementById("myCanvas");
+
+		if (event.x != undefined && event.y != undefined)
+		{
+		  x = event.x;
+		  y = event.y;
+		}
+		else // Firefox method to get the position
+		{
+		  x = event.clientX + document.body.scrollLeft +
+		      document.documentElement.scrollLeft;
+		  y = event.clientY + document.body.scrollTop +
+		      document.documentElement.scrollTop;
+		}
+
+		x -= canvas.offsetLeft;
+		y -= canvas.offsetTop;
+		if (starts.length != 0) {
+			if (line=="horizontal" && first_x != 0) {
+				x = horizontal_start[0]
+			}
+			if (line=="vertical" && first_y != 0) {
+				y = vertical_start[1]
+			}
+		}
+
+		
+		ctx.moveTo(x, y);
+		starts.push([x,y]);
+		if (line=="horizontal") {
+			if (horizontal_start.length < 1){
+				horizontal_start = [x,y]
+			}
+			if (first_x != 0) {
+				ends.push([first_x,y]);
+				ctx.lineTo(first_x, y);
+				ctx.stroke();
+			}
+		} else {
+			if (line=="vertical") {
+				if (vertical_start.length<1){
+					vertical_start = [x,y]
+				}
+				if (first_y != 0 ) {
+					ends.push([x,first_y]);
+					ctx.lineTo(x,first_y);
+					ctx.stroke();
+				}
+			}
+		}
+		
+		return false
+   	},false);
+   	file_input.addEventListener("change",function(e){
+
+		    var URL = window.URL;
+		    var url = URL.createObjectURL(e.target.files[0]);
+		    var img = new Image();
+		    img.src = url;
+
+
+		    img.onload = function() {
+
+
+		            img_width = img.width;
+		            img_height = img.height;
+
+		            ctx.drawImage(img, 0, 0, img_width, img_height,0,0,1200,1500);
+
+		    }
+
+	})
+	
+	
+}
+function getPosition(event)
+{
+	var x = new Number();
+	var y = new Number();
+	var canvas = document.getElementById("myCanvas");
+
+	if (event.x != undefined && event.y != undefined)
+	{
+	  x = event.x;
+	  y = event.y;
+	}
+	else // Firefox method to get the position
+	{
+	  x = event.clientX + document.body.scrollLeft +
+	      document.documentElement.scrollLeft;
+	  y = event.clientY + document.body.scrollTop +
+	      document.documentElement.scrollTop;
+	}
+
+	x -= canvas.offsetLeft;
+
+	y -= canvas.offsetTop;
+
+	if (line=="horizontal") {
+		y = starts[starts.length-1][1]
+	}
+	if (line=="vertical") {
+		x = starts[starts.length-1][0]
+	}
+	if (starts.length === 0) {
+		alert("Marca el inicio")
+	} else {
+		if (starts.length-1 != ends.length){
+			starts.push(ends[ends.length-1]);
+		}
+		if (line=="horizontal"){
+			if  (first_x === 0) {
+				first_x = x
+				ends.push([first_x,y]);
+				ctx.lineTo(first_x, y);
+				ctx.stroke();
+			}
+		} else {
+			if (line=="vertical") {
+				if (first_y===0){
+					first_y=y
+					ends.push([x,first_y]);
+					ctx.lineTo(x,first_y);
+					ctx.stroke();
+				}
+			}
+		}
+	}
+	
+	
+	//alert("x: " + x + "  y: " + y);
+}
+
+function CambiarLinea(){
+	if (line=="horizontal"){
+		line="vertical";
+	} else{
+		if (line=="vertical") {
+			line="horizontal";
+		}
+	}
+	console.log(line)
+	
+}
+
+function DrawMask(starts,ends){
+	var canvas = document.getElementById("myCanvas");
+	ctx = canvas.getContext("2d");
+   	ctx.beginPath();
+   	for (e in starts){
+   		ctx.moveTo(starts[e][0],starts[e][1])
+   		ctx.lineTo(ends[e][0],ends[e][1])
+   		ctx.stroke();
+   	}
+
+}
+
+function DeleteDrawing(){
+	var canvas = document.getElementById("myCanvas");
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	var file_input = document.getElementById("file_input");
+	file_input.value = "";
+}
+
+function convertCanvasToImage(canvas) {
+	var image = new Image();
+	//image.setAttribute('crossOrigin', 'anonymous');
+	image.src = canvas.toDataURL("image/jpg");
+	downloadURI(image.src,"tarifario-convertido.jpg")
+	return image
+}
+function downloadURI(uri, name) {
+	var link = document.createElement("a");
+	link.download = name;
+	link.href = uri;
+	document.body.appendChild(link);
+	link.click();
+	document.body.removeChild(link);
+	delete link;
+}
+
+</script>
+
+
+</body>
+</html>

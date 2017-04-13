@@ -623,48 +623,95 @@ class GeneradorBancamerica(Handler):
             self.render('generador.html',beneficios=beneficios,cont=contenido,contenido=content,user_base=user_base,url='Generador Bancamerica',link=self.request.get('link'))
         else:
             self.redirect('/_ImageData?sourceFile=Bancamerica&url='+self.request.get('link'))
+import re
+
 
 class GeneradorBanesco(Handler):
     def get(self):
+        #Obtengo el objeto con los datos extraidos
         file = db.GqlQuery("select * from Contenido where nombre='Banesco'").fetch(1)
+
+        #Si existe procede
         if file != []:
-            contenido = file[0].contenido
-            rows = {}
-            row = 1
-            while contenido.find(",") != -1:
+            efectivo_fila = 0 #Quiero determinar en cual fila quedara el avance de efectivo, por si en dado caso cambia
+            contenido = file[0].contenido #Cojo el contenido que voy a formatear
+            rows = {} #La primera version de los datos
+            row = 1 #Aqui es donde voy a empezar a formar las filas
+            while contenido.find(",") != -1: #Este while sera hasta que ya no haya contenido para formatear
                 fila = []
-                for e in range(0,5):
+                for e in range(0,5): #Los ire tomando de 5 en 5 mientras tanto, como son 6 tarjetas, la ultima queda sin formato
                     fila.append(contenido[0:contenido.find(",")])
                     contenido = contenido.replace(contenido[0:contenido.find(",")+1],"", 1)
-                rows["fila"+str(row)] = fila
+                    if "avance efectivo" in contenido[0:contenido.find(",")].lower():
+                        efectivo_fila = "fila"+str(row) #Aqui encontre el avance efectivo y en que fila esta
+                rows["fila"+str(row)] = fila #Agrego a los datos
                 row += 1
-            rows2 = {}
+            rows2 = {} #Inicio la copia de esos datos, sera la segunda version
             for e in rows:
-                if not (rows[e].count("RD$ 0") >= 5):
+                if not (rows[e].count("RD$ 0") >= 5): #Elimino las filas vacias
                     rows2[e] = rows[e]
-                if rows[e][3].count("RD$") > 1:
+                if rows[e][3].count("RD$") > 1: #Separo los datos que estan en una misma casilla en RD$
                     val1 = "RD$" + rows[e][3].split("RD$")[1]
                     val2 = "RD$" + rows[e][3].split("RD$")[2]
                     val3 = rows2[e][4]
                     rows2[e][3] = val1
                     rows2[e][4] = val2 + "," + val3
-                if rows[e][3].count("%") > 1:
+                if rows[e][3].count("%") > 1: #Vuelvo a separar en porcentaje
                     val1,val2 = rows[e][3].split("%")[0] + "%", rows[e][3].split("%")[1] + "%"
                     val3 = rows[e][4]
                     rows[e][3] = val1
                     rows[e][4] = val2 + "," + val3
+            rows2test = rows2
+
+            lista_perdida = []
+            for times in xrange(1):
+                for e in range(14,50):
+                    fila = rows2test.get("fila"+str(e))
+                    if fila != None:
+                        if not (fila.count("RD$ 0") > 3):
+                            rows2test["fila"+str(e)] = 0
+                        if fila != 0:
+                            for val in fila:
+                                if val != "RD$ 0":
+                                    lista_perdida.append(val)
+            para_eliminar = lista_perdida.index("Carta de")
+            lista_perdida[lista_perdida.index("Carta de")] = lista_perdida[para_eliminar] + lista_perdida[para_eliminar+1]
+            lista_perdida.remove(lista_perdida[para_eliminar+1])
+            test = re.compile("^RD [a-zA-Z]+")
+            lista_perdida2 = []
+            for elemento in lista_perdida:
+                logging.error(len(elemento))
+                if len(elemento) < 12:
+                    lista_perdida2.append(elemento)
+                    
 
 
-            efectivo = rows2["fila53"][2].split()[2]
-            for e in range(0,5):
-                rows2["fila53"][e] = efectivo
-                if e == 4:
-                    rows2["fila53"][e] = efectivo + "," + efectivo
+
+
+            efectivo = rows2[efectivo_fila] #Aqui determino el avance de efectivo con la variable del principio
+            for dato in efectivo:
+                if dato != "RD$ 0":
+                    efectivo = dato.split(" ")[2]
+            for e in range(0,5): #Asigno el valor del efectivo a cada tarjeta
+                rows2[efectivo_fila][e] = efectivo
+                if e == 4: #En la pos 4 quiero doble valor, pues hay dos tarjetas dentro de la Flotilla
+                    rows2[efectivo_fila][e] = efectivo + "," + efectivo
             logging.error(e)
             tarjetas = {"clasica":{},"gold":{},"platinum":{},"infinite":{},"flotilla":{"personal":{},"empresarial":{}},"empresarial":{}}
             positions = {"clasica":0,"gold":1,"platinum":2,"infinite":3,"flotilla":4,"empresarial":5,"flotilla_personal":0,"flotilla_empresarial":1}
-            final = agregar_valores(rows2,tarjetas,positions)
+            final = agregar_valores(rows2,tarjetas,positions,efectivo_fila)
             self.write(final)
+            self.write("<br><br>")
+            
+            
+            
+            
+            self.write(lista_perdida2)
+            self.write("<br><br>")
+            self.write(rows2)
+
+            
+            
 
             
 
@@ -704,7 +751,7 @@ class ImageData(Handler):
             if True:
                 ext = ".png"
                 banco = self.request.get("sourceFile")
-                if banco == "Banesco":
+                if banco == "Banesco" or banco == "Federal":
                     ext = ".jpg"
                 sourceFile = "img/" + banco + ext
                 language = "Spanish"
@@ -735,7 +782,7 @@ class ImageData(Handler):
     
         banco = self.request.get("sourceFile")
         ext = ".png"
-        if banco == "Banesco":
+        if banco == "Banesco" or banco == "Federal":
             ext = ".jpg"
         sourceFile = str(os.getcwd()) + "\\img\\" + banco + ext
         language = "Spanish"
@@ -758,6 +805,10 @@ class ImageData(Handler):
             result = file[0].contenido
             #self.redirect('/_ImageData')
             self.write(result)
+
+class Draw(Handler):
+    def get(self):
+        self.render("Draw.html")
 
 
     
@@ -786,6 +837,7 @@ app = webapp2.WSGIApplication([('/login', Login),
                                ('/generadorvimenca',GeneradorVimenca),
                                ('/_ImageData', ImageData),
                                ('/generadorbanesco', GeneradorBanesco),
+                               ('/_Draw',Draw),
                                (PAGE_RE, WikiPage),
                                ],
                               debug=True)

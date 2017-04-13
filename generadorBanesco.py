@@ -26,7 +26,7 @@ def formatear_banesco(result):
 				if sheet.cell_value(row,col) == "" and not("///" in sheet.cell_value(row,0) or "///" in sheet.cell_value(row,1) or "///" in sheet.cell_value(row,2)):
 					test = test + "RD$ 0,"
 				else:
-					if "RD$" in celda or "USD$" in celda or "%" in celda:
+					if "RD$" in celda or "USD$" in celda or "%" in celda or "Carta de" in celda:
 						test = test + celda + ","
 			except:
 				pass
@@ -42,7 +42,7 @@ def sacar_entero(cadena):
                 cadena = cadena.replace(e,"")
     return int(float(cadena))
 
-def agregar_valores(rows,dicts,positions):
+def agregar_valores(rows,dicts,positions,efectivo_fila):
 	dicts = dicts
 	datos = {}
 	postitions = positions
@@ -56,19 +56,20 @@ def agregar_valores(rows,dicts,positions):
 	datos["mora_us"] = rows['fila8']
 	datos["tasa_interes_rd"] =  rows["fila9"]
 	datos["tasa_interes_us"] = rows["fila10"]
-	datos["avance_efectivo"] = rows['fila53']
+	datos["avance_efectivo"] = rows[efectivo_fila]
 
 	for tarjeta in dicts:
 		if tarjeta == "flotilla":
 			for tarj in dicts[tarjeta]:
 				for dato in datos:
 					try:
+
 						dicts[tarjeta][tarj][dato] = datos[dato][positions[tarjeta]].split(",")[positions[tarjeta+"_"+tarj]]
 
 					except:
-						logging.error(tarjeta,tarj)
+						dicts[tarjeta][tarj][dato] = "RD$ 0"
 		else:
-			
+
 			for dato in datos:
 				
 
