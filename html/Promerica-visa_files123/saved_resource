@@ -1,0 +1,9 @@
+#suckerfishnav { url("images/taboff.jpg")repeat-x;font-size:11px;font-family:Arial, sans-serif;font-weight:fine;	width:100%;}#suckerfishnav, 
+#suckerfishnav ul {font-size:10px;float:left;list-style:none;line-height:22px;padding:0;border:0px solid #aaa;margin:0; width:100%;}
+#suckerfishnav a {display:block;color:#696969;font-size:12px;   font-weight:bold;padding:0px ;}
+#suckerfishnav li {float:left;padding:0;}
+#suckerfishnav ul {position:absolute;height:2.5;width:145px;font-weight:normal;margin:0;line-height:1;border:2 solid #696969 ;border-top:0px solid #696969;	border-bottom:2px solid #696969;}
+#suckerfishnav li li {	width:145px;border-bottom:0px solid #444444;border-left:0px solid #696969;border-right:0px solid #dcdcdc;font-size:11px;font-weight:normal;font-family:Arial, sans-serif; }
+#suckerfishnav li li a {padding:6px 0px 3px 0px ;	width:144px;font-size:12px;color:#696000;font-weight:normal}
+#suckerfishnav li ul ul {margin:-25px 0 0 145px;}
+#suckerfishnav li li:hover {background:#696969;}

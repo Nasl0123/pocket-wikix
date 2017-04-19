@@ -3,13 +3,14 @@
 import time
 import sys
 sys.path.insert(0, 'libs')
-import pdftables_api
 import xlrd
 import xlwt
+import re
 
-c = pdftables_api.Client('fc9wow7u2a9c')
-def crear_xlsx(banco):
-    c.xlsx(banco+'.pdf', 'xlsx/'+banco+'_output.xlsx')
+p = re.compile("([0-9]+%)|([0-9]+.[0-9]+%)|N/A|Gratis|([U])([S])([D])([$])([0-9]+.[0-9]+)|([U])([S])([D])([0-9]+.[0-9]+)|([R])([D])([$])([0-9]+.[0-9]+)|([R])([D])([$])([0-9]+)|([R])([D])([$])([0-9]+.[0-9]+)[ - ]([U])([S])([D])[ ]([0-9]+.[0-9]+)|([0-9]+)")
+j = re.compile(
+    '([…]+)([.]+)([…]+)([.]+)([…]+)([.]+)([…]+)([.]+)([…]+)|([…]+)([.]+)([…]+)([.]+)([…]+)([.]+)([…]+)([.]+)|([…]+)([.]+)([…]+)([.]+)([…]+)([.]+)([…]+)|([…]+)([.]+)([…]+)([.]+)([…]+)([.]+)|([…]+)([.]+)([…]+)([.]+)([…]+)|([…]+)([.]+)([…]+)([.]+)|([…]+)([.]+)([…]+)|([…]+)([.]+)|[…]+|Mora')
+k = re.compile('([á-úÁ-Úa-zA-Z0-9$-. ),(])+')
 
 def generar_promerica(banco):
     try:
@@ -17,86 +18,180 @@ def generar_promerica(banco):
         return a
     except:
         None
+        
+def limpiar_promerica(texto):
+    return texto.replace('  ', '').replace(',', '').replace('\n', ' ').replace('US$', 'USD$').replace('\xe2\x80\x93',
+                                                                                                      '').replace(
+        "\xc3\xa1", "a").replace("\xc3\xa9", "e").replace("\xc3\xad", "i").replace("\xc3\xb3", "o").replace("\xc3\xba",
+                                                                                                            "u").replace(
+        "\xc3\x81", "A").replace("\xc3\x89", "E").replace("\xc3\x8d", "I").replace("\xc3\x93", "O").replace("\xc3\x9a",
+                                                                                                            "U").replace(
+        "\xc3\xb1", "n").replace("\xc3\x91", "N").replace("\xc1", "A").replace("\xe1", "a").replace("\xc9",
+                                                                                                    "E").replace("\xe9",
+                                                                                                                 "e").replace(
+        "\xcd", "I").replace("\xed", "i").replace("\xd3", "O").replace("\xf3", "o").replace("\xda", "U").replace("\xfa",
+                                                                                                                 "u").replace(
+        "\xd1", "N").replace("\xf1", "n")
+
 
 def formatear_promerica(banco):
-    if True:
-        book = xlrd.open_workbook('xlsx/'+banco+'_output.xlsx')
-        sheet = book.sheet_by_index(0)
-        var = {}
-        ind = ['','','','','emision','','renovacion','','renovacion_premium','renovacion_crediplus',
-               'renovacion_lamaplazos','renovacion_spirit','','seguro_proteccion','','avance_efectivo',
-               '','','tasa_interes_rd','tasa_interes_usd','','','','comision_mora']
-        for row in range(4,24):
-            var[ind[row]] = []
-            num = 0
-            for col in range(5,8):
-                val = limpiar_promerica(sheet.cell_value(row,col))
-                if val == '':
-                    val = quitar_puntos(limpiar_promerica(sheet.cell_value(row,4)))[num]
-                var[ind[row]].append(val)
-                num += 1
-        var['sobregiro'] = sheet.cell_value(21,4)+'/'+sheet.cell_value(22,4)
-        return var
-    else:
-        None
+    a = open('txt/'+banco+'.txt','r').read()
+    num,b,c,z = 0,0,0,0
+    si = []
+    final = []
+    while a.find('\n', num) != -1:
+        si.append(a.find('\n', num))
+        num = a.find('\n', num) + 1
+    resultado = {}
+    i = 0
+    l = i
+    n = si[i]
+    lines = None
+    while i < len(si):
+        lim = 0
+        linea = a[n:si[i] + 1]
+        if not resultado.get('linea_' + str(l)):
+            resultado['linea_' + str(l)] = {}
+            used = resultado['linea_' + str(l)]
+        l = i
+        for e in j.finditer(linea):
+            if b + c == 0:
+                b, c = e.span()
+            if not lines:
+              line = k.search(linea[lim:b])
+              if line:
+                  line = line.group()
+              else:
+                  line = ''
+              line = limpiar_promerica(line)
+            else:
+              line = lines
+            used[line] = []
+            final = used[line]
+            for x in p.finditer(linea):
+                d, f = x.span()
+                if d > b and (linea[c + 1:d].find('…') == -1 and linea[c + 1:d].find('Mora') == -1):
+                    final.append(limpiar_promerica(linea[d:f]))
+                    lim = f
+            if len(final) == 0:
+              lines = line
+            else:
+              lines = None
+              b,c = 0,0
+        if len(final) == 0:
+          linea = a[si[i]:si[i+1] + 1]
+          for x in p.finditer(linea):
+              d, f = x.span()
+              if (linea[c + 1:d].find('…') == -1 and linea[c + 1:d].find('Mora') == -1):
+                  final.append(limpiar_promerica(linea[d:f]))
+                  lim = f
+          lines,b,c = None,0,0
+          lim = 0
+        n = si[i]
+        i += 1
+        l = i
+    return quitar_vacios(resultado)
 
-def limpiar_promerica(texto):
-    if type(texto) == float:
-        return str(texto*100)+'%'
-    return texto.encode('utf-8').replace(',','').replace('USD','USD$').replace("\xc3\xa1","a").replace("\xc3\xa9","e").replace("\xc3\xad","i").replace("\xc3\xb3","o").replace("\xc3\xba","u").replace("\xc3\x81","A").replace("\xc3\x89","E").replace("\xc3\x8d","I").replace("\xc3\x93","O").replace("\xc3\x9a","U").replace("\xc3\xb1","n").replace("\xc3\x91","N").replace("\xc1","A").replace("\xe1","a").replace("\xc9","E").replace("\xe9","e").replace("\xcd","I").replace("\xed","i").replace("\xd3","O").replace("\xf3","o").replace("\xda","U").replace("\xfa","u").replace("\xd1","N").replace("\xf1","n")
 
-def quitar_puntos(texto):
-    res1,res2,res3 = None,None,None
-    if texto == '':
-        return ''
-    texto1 = texto.replace('.','')
-    if 'RD' in texto1:
-        if 'N/A' in texto1[texto1.find('RD'):]:
-            res1 = texto1[:texto1.find('RD')]
-            res2 = texto1[texto1.find('RD'):texto1.find('N/A')][:-2]+'.'+texto1[texto1.find('RD'):texto1.find('N/A')][-2:]
-            res3 = texto1[texto1.find('N/A'):]
-        else:
-            res1 = texto1[:texto1.find('RD')]
-            res2 = texto1[texto1.find('RD'):][:-2]+'.'+texto1[texto1.find('RD'):][-2:]
-            res3 = None
-    elif 'N/A' in texto1:
-        res1 = texto1[:texto1.find('N/A')]
-        res2 = texto1[texto1.find('N/A'):]
-        res3 = None
-    elif '%' in texto1:
-        if texto1[texto1.find('%')-1].isdigit():
-            num = otra_funcion(texto1[:texto1.find('%')])
-            res1 = texto1[:num]
-            res2 = texto1[num:texto1.find('%')+1]
-            res3 = None
-    return (res2,res3,res1)
-
-def otra_funcion(texto):
-    num = -2
-    while texto[num].isdigit():
-        num -= 1
-    return num
+def quitar_vacios(resultado):
+    borrar = []
+    for s in resultado:
+      for t in resultado[s]:
+        if len(resultado[s][t]) == 0:
+          borrar.append(t)
+      for r in borrar:
+        del resultado[s][r]
+      borrar = []
+    borrar = []
+    for e in resultado:
+      if len(resultado[e]) == 0:
+        borrar.append(e)
+    for x in borrar:
+      del resultado[x]
+    return resultado
         
 def obtener_tarjeta_promerica(tarjeta,info):
-    resultado = {}
+    deter = 0
+    resultado = {'tasa_interes':[],
+                 'sobregiro':'RD$500.00/USD$12.50'}
+    seccionGeneral,seccionBusiness,seccionBlack = {},{},{}
+    for menos46 in info:
+        if int(menos46.split('_')[1]) < 46 and int(menos46.split('_')[1]) > 30:
+            seccionBusiness[menos46] = info[menos46]
+    for menos31 in info:
+        if int(menos31.split('_')[1]) < 31:
+            seccionGeneral[menos31] = info[menos31]
+    for menos76 in info:
+        if int(menos76.split('_')[1]) < 76 and int(menos76.split('_')[1]) > 45:
+            seccionBlack[menos76] = info[menos76]
     if 'clasica' in tarjeta:
-        ind = 0
+        deter = 0
     elif 'gold' in tarjeta:
-        ind = 1
+        deter = 1
     elif 'platinum' in tarjeta:
-        ind = 2
-    else:
-        ind = 3
+        deter = 2
+    elif 'business' in tarjeta:
+        deter = 3
+    elif 'infinite' in tarjeta or 'black' in tarjeta:
+        deter = 4
 
-    resultado['emision'] = info['emision'][ind]
-    resultado['seguro_proteccion'] = info['seguro_proteccion'][ind]
-    resultado['tasa_interes'] = 'RD$'+info['tasa_interes_rd'][ind]+'/USD$'+info['tasa_interes_usd'][ind]
-    resultado['avance_efectivo'] = info['avance_efectivo'][ind]
-    resultado['comision_mora'] = info['comision_mora'][ind]
-    resultado['sobregiro'] = info['sobregiro']
-    resultado['renovacion'] = info['renovacion'][ind]
-    for e in info:
-        if len(e.split('_')) > 1:
-            if e.split('_')[1] in tarjeta and e.split('_')[0] == 'renovacion':
-                resultado['renovacion'] = info[e][ind]
+    if deter < 3:
+        for linea in seccionGeneral:
+            for dato in seccionGeneral[linea]:
+                if 'emision' in dato.lower() and not 'adicional' in dato.lower():
+                    
+                    resultado['emision'] = seccionGeneral[linea][dato][deter]
+                if 'renovacion' in dato.lower() and not 'tarjeta' in dato.lower():
+                    resultado['renovacion'] = seccionGeneral[linea][dato][deter]
+                if 'renovacion' in dato.lower() and comparar_promerica(tarjeta,dato):
+                    resultado['renovacion1'] = seccionGeneral[linea][dato][deter]
+                if 'seguro' in dato.lower() and 'perdida' in dato.lower():
+                    resultado['seguro_proteccion'] = seccionGeneral[linea][dato][deter]
+                if 'avance' in dato.lower() and 'efectivo' in dato.lower():
+                    resultado['avance_efectivo'] = seccionGeneral[linea][dato][deter]
+                if 'pesos' in dato.lower():
+                    resultado['tasa_interes'].append('RD$'+seccionGeneral[linea][dato][deter])
+                if 'dolares' in dato.lower():
+                    resultado['tasa_interes'].append('USD$'+seccionGeneral[linea][dato][deter])
+                if ' cargo' in dato.lower() and 'por' in dato.lower():
+                    resultado['comision_mora'] = seccionGeneral[linea][dato][deter]
+    elif deter == 3:
+        for linea in seccionBusiness:
+            for dato in seccionBusiness[linea]:
+                if 'emision' in dato.lower():
+                    resultado['emision'] = seccionBusiness[linea][dato][0]
+                if 'renovacion' in dato.lower():
+                    resultado['renovacion'] = seccionBusiness[linea][dato][0]
+                if 'seguro' in dato.lower() and 'perdida' in dato.lower():
+                    resultado['seguro_proteccion'] = seccionBusiness[linea][dato][0]
+                if 'cargo' in dato.lower() and 'por' in dato.lower():
+                    resultado['comision_mora'] = seccionBusiness[linea][dato][0]
+        resultado['tasa_interes'] = '36%'
+    elif deter == 4:
+        for linea in seccionBlack:
+            for dato in seccionBlack[linea]:
+                if 'emision' in dato.lower():
+                    resultado['emision'] = seccionBlack[linea][dato][0]
+                if 'renovacion' in dato.lower():
+                    resultado['renovacion'] = seccionBlack[linea][dato][0]
+                if 'seguro' in dato.lower():
+                    resultado['seguro_proteccion'] = seccionBlack[linea][dato][0]
+                if 'interes' in dato.lower() and 'financiamiento' in dato.lower():
+                    resultado['tasa_interes'].append('RD$'+seccionBlack[linea][dato][0])
+                    resultado['tasa_interes'].append('RD$'+seccionBlack[linea][dato][1])
+                if 'retiro' in dato.lower():
+                    resultado['avance_efectivo'] = '6.25%'
+                
+    if resultado.get('renovacion1'):
+        resultado['renovacion'] = resultado['renovacion1']
+        del resultado['renovacion1']
+    if type(resultado['tasa_interes']) == list:
+        resultado['tasa_interes'] = resultado['tasa_interes'][0]+'/'+resultado['tasa_interes'][1]
     return resultado
+
+def comparar_promerica(tarjeta,dato):
+    tarjeta_list = tarjeta.split()
+    for e in tarjeta_list:
+        if e in dato.lower():
+            return True
+    return False

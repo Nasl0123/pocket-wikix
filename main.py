@@ -10,6 +10,8 @@ import hashlib
 import urllib2
 import urllib
 import time
+
+
 from generadorPopular import obtener_tarjeta_popular,formatear_popular,generar_popular,generar_info_popular
 from generadorProgreso import obtener_tarjeta_progreso,formatear_progreso,generar_progreso
 from generadorLopezDeHaro import obtener_tarjeta_lopezdeharo,formatear_lopezdeharo,generar_lopezdeharo,generar_info_lopezdeharo
@@ -24,12 +26,18 @@ from generadorSantaCruz import obtener_tarjeta_santacruz, formatear_santacruz, g
 from generadorBHD import obtener_tarjeta_bhd, formatear_bhd, generar_bhd
 from generadorBancamerica import formatear_bancamerica,generar_bancamerica,obtener_tarjeta_bancamerica
 from generadorVimenca import formatear_vimenca, generar_vimenca, obtener_tarjeta_vimenca
-from scraper import obtener_beneficios,datos_tarjeta
+from generadorPromerica import formatear_promerica, generar_promerica, obtener_tarjeta_promerica
+from generadorCaribe import formatear_caribe, generar_caribe, obtener_tarjeta_caribe
+from generadorAPAP import formatear_apap, generar_apap, obtener_tarjeta_apap
+
+
+from scraper import obtener_beneficios,datos_tarjeta,obtener_beneficios_promerica,test_pro
 from indices import get_indices,formato_general,limpiar
 from google.appengine.api import urlfetch
 import json
 from process import *
 from google.appengine.api import app_identity
+
 
 
 urlfetch.set_default_fetch_deadline(100)
@@ -45,6 +53,13 @@ class Handler(webapp2.RequestHandler):
         return y.render(params)
     def render(self,template,**kw):
         self.write(self.render_str(template,**kw))
+
+
+
+
+class TestPro(Handler):
+    def get(self):
+        self.write(test_pro('http://www.promerica.com.do/?page_id=4002'))
 
 class Signup(Handler):
     def get(self):
@@ -623,6 +638,72 @@ class GeneradorBancamerica(Handler):
         else:
             self.redirect('/_ImageData?sourceFile=Bancamerica&url='+self.request.get('link'))
 
+class GeneradorPromerica(Handler):
+    def get(self):
+        user_base = self.request.cookies.get('user_id')
+        if user_base:
+            user_base = user_base.split('|')[0]
+        else:
+            user_base = ''
+        self.render('generador.html',user_base=user_base,url='Generador Promerica')
+    def post(self):
+        user_base = self.request.cookies.get('user_id')
+        if user_base:
+            user_base = user_base.split('|')[0]
+        else:
+            user_base = ''
+        banco = self.request.get('banco')
+        tarjeta = self.request.get('tarjeta')
+        datos = get_cache(banco+tarjeta+'_datos',datos_tarjeta('Promerica',self.request.get('tarjeta')))
+        contenido=get_cache(banco+tarjeta+'_contenido',obtener_tarjeta_promerica(self.request.get('tarjeta'),generar_promerica('Promerica')))
+        beneficios=get_cache(banco+tarjeta+'_beneficios',obtener_beneficios_promerica(datos[0],datos[1],datos[2],['h2','collapseomatic',get_indices(self.request.get('link'))[1]]))
+        content = formato_general(self.request.get('title'),contenido,beneficios)
+        self.render('generador.html',beneficios=beneficios,cont=contenido,contenido=content,user_base=user_base,url='Generador Promerica',link=self.request.get('link'))
+
+class GeneradorCaribe(Handler):
+    def get(self):
+        user_base = self.request.cookies.get('user_id')
+        if user_base:
+            user_base = user_base.split('|')[0]
+        else:
+            user_base = ''
+        self.render('generador.html',user_base=user_base,url='Generador Caribe')
+    def post(self):
+        user_base = self.request.cookies.get('user_id')
+        if user_base:
+            user_base = user_base.split('|')[0]
+        else:
+            user_base = ''
+        banco = self.request.get('banco')
+        tarjeta = self.request.get('tarjeta')
+        datos = get_cache(banco+tarjeta+'_datos',datos_tarjeta('Caribe',self.request.get('tarjeta')))
+        contenido=get_cache(banco+tarjeta+'_contenido',obtener_tarjeta_caribe(self.request.get('tarjeta'),generar_caribe('Caribe')))
+        beneficios=get_cache(banco+tarjeta+'_beneficios',obtener_beneficios(datos[0],datos[1],datos[2]))
+        content = formato_general(self.request.get('title'),contenido,beneficios)
+        self.render('generador.html',beneficios=beneficios,cont=contenido,contenido=content,user_base=user_base,url='Generador Caribe',link=self.request.get('link'))
+
+class GeneradorAPAP(Handler):
+    def get(self):
+        user_base = self.request.cookies.get('user_id')
+        if user_base:
+            user_base = user_base.split('|')[0]
+        else:
+            user_base = ''
+        self.render('generador.html',user_base=user_base,url='Generador APAP')
+    def post(self):
+        user_base = self.request.cookies.get('user_id')
+        if user_base:
+            user_base = user_base.split('|')[0]
+        else:
+            user_base = ''
+        banco = self.request.get('banco')
+        tarjeta = self.request.get('tarjeta')
+        datos = get_cache(banco+tarjeta+'_datos',datos_tarjeta('APAP',self.request.get('tarjeta')))
+        contenido=get_cache(banco+tarjeta+'_contenido',obtener_tarjeta_apap(self.request.get('tarjeta'),generar_apap('APAP')))
+        beneficios=get_cache(banco+tarjeta+'_beneficios',obtener_beneficios(datos[0],datos[1],datos[2]))
+        content = formato_general(self.request.get('title'),contenido,beneficios)
+        self.render('generador.html',beneficios=beneficios,cont=contenido,contenido=content,user_base=user_base,url='Generador APAP',link=self.request.get('link'))
+
 class FlushCache(Handler):
     def get(self):
         tarjeta = self.request.get('tarjeta')
@@ -721,7 +802,13 @@ app = webapp2.WSGIApplication([('/login', Login),
                                ('/generadorbhd',GeneradorBHD),
                                ('/generadorbancamerica',GeneradorBancamerica),
                                ('/generadorvimenca',GeneradorVimenca),
+                               ('/generadorpromerica',GeneradorPromerica),
+                               ('/generadorcaribe',GeneradorCaribe),
+                               ('/generadorapap',GeneradorAPAP),
+
                                ('/_ImageData', ImageData),
+
+                               ('/test_pro',TestPro),
                                (PAGE_RE, WikiPage),
                                ],
                               debug=True)
