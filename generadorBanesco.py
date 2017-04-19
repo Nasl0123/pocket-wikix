@@ -19,8 +19,8 @@ def formatear_banesco(result):
 	book = xlrd.open_workbook(file_contents=result)
 	sheet = book.sheet_by_index(0)
 	test = ""
-	for row in range(31,108):
-		for col in range(0,5):
+	for row in range(4,25):
+		for col in range(0,8):
 			try:
 				celda = limpiar_banesco(sheet.cell_value(row,col))
 				if sheet.cell_value(row,col) == "" and not("///" in sheet.cell_value(row,0) or "///" in sheet.cell_value(row,1) or "///" in sheet.cell_value(row,2)):

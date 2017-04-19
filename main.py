@@ -95,6 +95,11 @@ class Contenido(db.Model):
     nombre = db.StringProperty(required=True)
     contenido = db.TextProperty(required=True)
 USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
+
+class Mascara(db.Model):
+    nombre = db.StringProperty(required=True)
+    inicios = db.ListProperty(required=True,item_type=str)
+    fines = db.ListProperty(required=True,item_type=str)
 def valid_username(username):
     if USER_RE.match(username):
         return (True,username)
@@ -808,7 +813,23 @@ class ImageData(Handler):
 
 class Draw(Handler):
     def get(self):
-        self.render("Draw.html")
+        mascara = db.GqlQuery("select * from Mascara where nombre='Banesco'").fetch(1)
+        starts = self.request.cookies.get("starts")
+        ends = self.request.cookies.get("ends")
+        if len(mascara) == 0:
+            if starts and ends:
+                mascara = Mascara(nombre="Banesco",inicios=starts.split("/"),fines=ends.split("/"))
+                
+                mascara.put()
+                time.sleep(1)
+                mascara = db.GqlQuery("select * from Mascara where nombre='Banesco'").fetch(1)[0]
+                self.render("Draw.html",starts=json.dumps(mascara.inicios),ends=json.dumps(mascara.fines))
+            else:
+                self.render("Draw.html",starts=[],ends=[])
+
+        else:
+
+            self.render("Draw.html",starts=json.dumps(mascara[0].inicios),ends=json.dumps(mascara[0].fines))
 
 
     

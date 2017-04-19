@@ -2,11 +2,14 @@
 <html>
 <body>
 
+<button id="guardarMask" style="float:right" onclick="loadMascara();">Cargar Mascara</button>
+<button id="guardarMask" style="float:right" onclick="guardarMascara();">Guardar Mascara</button>
 <button id="applyMask" style="float:right" onclick="DrawMask(starts,ends);">Dibujar Mascara</button>
 <button id="clearDraw" style="float:right" onclick="DeleteDrawing();">Limpiar</button>
 <button id="cambiarLinea" style="float:right" onclick="CambiarLinea();">Vertical/Horizontal</button>
 <button id="downloadResult" style="float:right" onclick="convertCanvasToImage(canvas);">Convertir Imagen</button>
 <input type="file" id="file_input" style="float:right">
+
 <canvas id="myCanvas" style="border:1px solid #d3d3d3;">
 
 </canvas>
@@ -25,91 +28,126 @@ function init(){
 	vertical_start=[];
 	horizontal_start=[];
     canvas = document.getElementById("myCanvas");
-    canvas.addEventListener("click", getPosition, false);
+    
+    
     canvas.height = 1500;
     canvas.width = 1200;
 
    	ctx = canvas.getContext("2d");
    	ctx.beginPath();
-   	ctx.lineWidth=2.4;
-   	canvas.addEventListener('contextmenu', function(ev){
-   		ev.preventDefault();
-   		var x = new Number();
-		var y = new Number();
-		var canvas = document.getElementById("myCanvas");
-
-		if (event.x != undefined && event.y != undefined)
-		{
-		  x = event.x;
-		  y = event.y;
-		}
-		else // Firefox method to get the position
-		{
-		  x = event.clientX + document.body.scrollLeft +
-		      document.documentElement.scrollLeft;
-		  y = event.clientY + document.body.scrollTop +
-		      document.documentElement.scrollTop;
-		}
-
-		x -= canvas.offsetLeft;
-		y -= canvas.offsetTop;
-		if (starts.length != 0) {
-			if (line=="horizontal" && first_x != 0) {
-				x = horizontal_start[0]
-			}
-			if (line=="vertical" && first_y != 0) {
-				y = vertical_start[1]
-			}
-		}
-
-		
-		ctx.moveTo(x, y);
-		starts.push([x,y]);
-		if (line=="horizontal") {
-			if (horizontal_start.length < 1){
-				horizontal_start = [x,y]
-			}
-			if (first_x != 0) {
-				ends.push([first_x,y]);
-				ctx.lineTo(first_x, y);
-				ctx.stroke();
-			}
-		} else {
-			if (line=="vertical") {
-				if (vertical_start.length<1){
-					vertical_start = [x,y]
-				}
-				if (first_y != 0 ) {
-					ends.push([x,first_y]);
-					ctx.lineTo(x,first_y);
-					ctx.stroke();
-				}
-			}
-		}
-		
-		return false
-   	},false);
+   	ctx.lineWidth=1;
+   	ctx.strokeStyle="red";
+   	
+   	
    	file_input.addEventListener("change",function(e){
+   		if (getCookie("ends").length < 1) {
+    		canvas.addEventListener("click", getPosition, false);
+    	}
+    	if (getCookie("starts").length < 1) {
+	   		canvas.addEventListener('contextmenu', function(ev){
+		   		ev.preventDefault();
+		   		var x = new Number();
+				var y = new Number();
+				var canvas = document.getElementById("myCanvas");
 
-		    var URL = window.URL;
-		    var url = URL.createObjectURL(e.target.files[0]);
-		    var img = new Image();
-		    img.src = url;
+				if (event.x != undefined && event.y != undefined)
+				{
+				  x = event.x;
+				  y = event.y;
+				}
+				else // Firefox method to get the position
+				{
+				  x = event.clientX + document.body.scrollLeft +
+				      document.documentElement.scrollLeft;
+				  y = event.clientY + document.body.scrollTop +
+				      document.documentElement.scrollTop;
+				}
+
+				x -= canvas.offsetLeft;
+				y -= canvas.offsetTop;
+				if (starts.length != 0) {
+					if (line=="horizontal" && first_x != 0) {
+						x = horizontal_start[0]
+					}
+					if (line=="vertical" && first_y != 0) {
+						y = vertical_start[1]
+					}
+				}
+
+				
+				ctx.moveTo(x, y);
+				starts.push([x,y]);
+				if (line=="horizontal") {
+					if (horizontal_start.length < 1){
+						horizontal_start = [x,y]
+					}
+					if (first_x != 0) {
+						ends.push([first_x,y]);
+						ctx.lineTo(first_x, y);
+						ctx.stroke();
+					}
+				} else {
+					if (line=="vertical") {
+						if (vertical_start.length<1){
+							vertical_start = [x,y]
+						}
+						if (first_y != 0 ) {
+							ends.push([x,first_y]);
+							ctx.lineTo(x,first_y);
+							ctx.stroke();
+						}
+					}
+				}
+				
+				
+				
+				return false
+		   	},false);
+	   	};
+
+	    var URL = window.URL;
+	    var url = URL.createObjectURL(e.target.files[0]);
+	    var img = new Image();
+	    img.src = url;
 
 
-		    img.onload = function() {
+	    img.onload = function() {
 
 
-		            img_width = img.width;
-		            img_height = img.height;
+	            img_width = img.width;
+	            img_height = img.height;
 
-		            ctx.drawImage(img, 0, 0, img_width, img_height,0,0,1200,1500);
+	            ctx.drawImage(img, 0, 0, img_width, img_height,0,0,1200,1500);
 
-		    }
+	    }
 
 	})
 	
 	
+}
+function list_str(list){
+	var str = "";
+	for (e in list) {
+		console.log(list[e])
+		list[e] = list[e].toString();
+	}
+	var str = list.join("-");
+	return str
+}
+function work_with_cookies(){
+	var starts_for_cookie = ""
+	var ends_for_cookie = ""
+	var st = starts
+	var end = ends
+	for (e in st.length-1) {
+		starts_for_cookie = starts_for_cookie + list_str(st[e]) + "/";
+	}
+	for (e in end.length-1) {
+		ends_for_cookie = ends_for_cookie + list_str(end[e])+"/";
+	}
+	setCookie("starts",starts_for_cookie,360);
+	setCookie("ends",ends_for_cookie,360);
+	console.log("test")
 }
 function getPosition(event)
 {
@@ -180,14 +218,52 @@ function CambiarLinea(){
 	console.log(line)
 	
 }
-
+function guardarMascara() {
+	work_with_cookies()
+	location.reload();
+}
+function loadMascara() {
+	starts = {{starts|safe}}
+	ends = {{starts|safe}}
+	for (e in starts) {
+		starts[e] = [parseInt(starts[e].split("-")[0]),parseInt(starts[e].split("-")[1])]
+	}
+	for (e in ends) {
+		ends[e] = [parseInt(ends[e].split("-")[0]),parseInt(ends[e].split("-")[1])]
+	}
+	
+	work_with_cookies();
+}
+function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires="+ d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+function getCookie(cname) {
+    var name = cname + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+    for(var i = 0; i <ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
 function DrawMask(starts,ends){
+	var sts = getCookie("starts").split("/");
+	var end = getCookie("ends").split("/");
 	var canvas = document.getElementById("myCanvas");
 	ctx = canvas.getContext("2d");
    	ctx.beginPath();
-   	for (e in starts){
-   		ctx.moveTo(starts[e][0],starts[e][1])
-   		ctx.lineTo(ends[e][0],ends[e][1])
+   	for (e in sts){
+   		ctx.moveTo(parseInt(sts[e].split("-")[0]),parseInt(sts[e].split("-")[1]))
+   		ctx.lineTo(parseInt(end[e].split("-")[0]),parseInt(end[e].split("-")[1]))
    		ctx.stroke();
    	}
 
@@ -198,6 +274,10 @@ function DeleteDrawing(){
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	var file_input = document.getElementById("file_input");
 	file_input.value = "";
+	setCookie("starts","");
+	setCookie("ends","");
+	starts = [];
+	ends = [];
 }
 
 function convertCanvasToImage(canvas) {
@@ -218,6 +298,7 @@ function downloadURI(uri, name) {
 }
 
 </script>
+
 
 
 </body>
